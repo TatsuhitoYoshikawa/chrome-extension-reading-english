@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading English テスト用ページ</title>
+<style>body { font-family: sans-serif; max-width: 640px; margin: 0 auto; padding: 16px; }</style>
+</head>
+<body>
+  <h1 id="h1">日本語の見出しです</h1>
+  <p id="p1">これは日本語の段落です。英訳が直下に表示されるはずです。</p>
+  <p id="p-en">This paragraph is already English and must be skipped.</p>
+  <p id="dup1">同じ文章です。</p>
+  <p id="dup2">同じ文章です。</p>
+  <ul>
+    <li id="li-nested">親の項目です<ul><li id="li-child">子の項目です</li></ul></li>
+    <li id="li-p"><p id="p-in-li">リストの中の段落です</p></li>
+  </ul>
+  <p id="ruby"><ruby>漢字<rt>かんじ</rt></ruby>を読みます</p>
+  <div id="div-text">ディブ直下のテキスト<br>二行目のテキスト</div>
+  <p id="br-only-jp">短</p>
+  <textarea id="ta">入力欄の日本語</textarea>
+  <input id="inp" value="入力欄の日本語">
+  <pre id="pre">コードブロックの日本語</pre>
+  <nav id="nav"><a href="#">ナビゲーション</a></nav>
+  <script>/* スクリプト内の日本語 */</script>
+  <div id="editable" contenteditable="true">編集可能な日本語</div>
+  <p id="far" style="margin-top: 6000px">ずっと下にある段落です</p>
+</body>
+</html>

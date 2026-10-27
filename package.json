@@ -1,0 +1,13 @@
+{
+  "name": "chrome-extension-reading-english",
+  "private": true,
+  "version": "0.1.0",
+  "description": "日本語ページに英訳を差し込む英語学習用 Chrome 拡張機能（開発用。拡張機能本体は extension/）",
+  "scripts": {
+    "test": "node test/run.cjs",
+    "test:extension": "node test/extension-smoke.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.50.0"
+  }
+}
