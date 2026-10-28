@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#1d4ed8">
+<title>Bilingual Reader</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <a href="#/" class="brand">Bilingual Reader</a>
+  <nav><a href="#/">本棚</a><a href="#/vocab">単語帳</a></nav>
+</header>
+<main id="main"></main>
+<aside id="sheet" hidden>
+  <button type="button" id="sheet-close" aria-label="閉じる">×</button>
+  <div id="sheet-word"></div>
+  <div id="sheet-meaning"></div>
+  <p id="sheet-sentence"></p>
+  <div id="sheet-status"></div>
+</aside>
+<script src="app.js"></script>
+</body>
+</html>

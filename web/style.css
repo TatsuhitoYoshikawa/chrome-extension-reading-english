@@ -1,0 +1,156 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1f2937;
+  --sub: #6b7280;
+  --line: #e5e7eb;
+  --accent: #1d4ed8;
+  --ja: #475569;
+  --ja-bg: #f1f5f9;
+  --sel: #fde68a;
+  --read: #16a34a;
+  --sheet: #ffffff;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111827;
+    --fg: #e5e7eb;
+    --sub: #9ca3af;
+    --line: #374151;
+    --accent: #93c5fd;
+    --ja: #cbd5e1;
+    --ja-bg: #1f2937;
+    --sel: #92400e;
+    --read: #4ade80;
+    --sheet: #1f2937;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+a { color: var(--accent); }
+button { font: inherit; color: inherit; }
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.brand { font-weight: 700; text-decoration: none; }
+.bar nav a { margin-left: 16px; text-decoration: none; }
+
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 16px 16px calc(45vh + env(safe-area-inset-bottom));
+}
+
+h1 { font-size: 1.6rem; margin: 0.2em 0; }
+h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
+.sub { color: var(--sub); font-size: 0.85rem; }
+.error { color: #dc2626; }
+
+/* 本棚 */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat {
+  padding: 12px 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  text-align: center;
+}
+.stat b { display: block; font-size: 1.5rem; }
+.stat span { color: var(--sub); font-size: 0.8rem; }
+.works { list-style: none; padding: 0; margin: 0; }
+.works a {
+  display: block;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+.works .title { display: block; font-weight: 600; }
+.works .sub { display: block; }
+
+/* 本文 */
+.reader-head { margin-bottom: 16px; }
+.toggle, .mark, .del {
+  min-height: 40px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+.para { padding: 4px 0 12px; border-bottom: 1px solid var(--line); scroll-margin-top: 64px; }
+.en { font-size: 1.1rem; line-height: 1.8; margin: 8px 0; }
+.w { cursor: pointer; border-radius: 3px; }
+.w.sel { background: var(--sel); }
+.ja {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--ja-bg);
+  color: var(--ja);
+  font-size: 0.9rem;
+}
+.hide-ja .ja { display: none; }
+.mark { width: 100%; color: var(--sub); }
+.para.read .mark { color: var(--read); border-color: var(--read); }
+.para.read .en { color: var(--sub); }
+.source { margin-top: 24px; color: var(--sub); font-size: 0.8rem; }
+
+/* 単語の意味（画面下のパネル） */
+#sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  background: var(--sheet);
+  border-top: 1px solid var(--line);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.15);
+}
+#sheet[hidden] { display: none; }
+#sheet-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+#sheet-word { font-size: 1.3rem; font-weight: 700; }
+#sheet-meaning { margin: 4px 0 8px; }
+#sheet-sentence { margin: 0 0 8px; color: var(--sub); font-size: 0.9rem; }
+#sheet-sentence mark { background: var(--sel); color: inherit; }
+#sheet-status { color: var(--accent); font-size: 0.85rem; }
+
+/* 単語帳 */
+.vocab { list-style: none; padding: 0; margin: 0; }
+.vocab li { position: relative; padding: 12px 64px 12px 0; border-bottom: 1px solid var(--line); }
+.vw b { margin-right: 8px; font-size: 1.1rem; }
+.vs { margin: 4px 0 0; color: var(--sub); font-size: 0.85rem; }
+.del { position: absolute; top: 12px; right: 0; font-size: 0.8rem; }

@@ -1,126 +1,90 @@
-# Reading English (ja→en)
+# Bilingual Reader
 
-日本語のサイトを読みながら英語を学ぶための、自分用の Chrome 拡張機能（Manifest V3）です。
-ツールバーのボタンを押すと、表示中のページにある日本語の段落・見出しの直下に英訳を差し込みます。
+英語の名作（著作権切れ）を、日本語訳を並べて読む自分用の英語学習ウェブアプリです。スマホ（Android の Chrome）で使うことを前提にしています。
 
-- 翻訳には **Chrome 組み込みの Translator API（ja→en）** を使います。外部 API やサーバーには一切通信しません。
-- もう一度ボタンを押すと英訳を非表示にし、さらに押すと再表示します。
-- 初回だけ翻訳モデルのダウンロードが必要です。ダウンロード中は画面下に進捗バーを表示します。
-- 日本語を含まない要素、`script` / `style` / 入力欄 / コード / ナビゲーションなどは翻訳しません。
-- 無限スクロールなどで後から追加された要素や、書き換えられた文章にも追従します。
-- 画面に近づいたブロックから順に翻訳します（長いページでも最初の表示が速い）。
-- 同じ文章は 2 回翻訳せず、ページ内のメモリにキャッシュします。
+- 英文の段落ごとに日本語訳を表示します（「和訳を隠す」で英文だけにもできます）。
+- **単語をタップ**すると、**その文の中での意味**と、その単語を含む 1 文を画面下に表示します。
+- **同じ単語をもう一度タップ**すると単語帳に登録します。
+- 段落の下の **「ここまで読んだ」** を押すと、その段落まで読んだことを記録します。
+- 本棚の画面に **読んだ単語数（延べ）** と **単語の種類数（同じ単語は 1 回だけ数える）** と単語帳の件数を表示します。
+- 作品を開くと、続き（まだ読んでいない最初の段落）から表示します。
+- 記録はすべて **この端末のブラウザの中だけ**（localStorage）に保存します。サーバーへは何も送らず、次に開いたときもそのまま残っています。
+- 一度開けば、オフラインでも読めます。
 
-> [!WARNING]
-> **スマホではこのままでは動きません。** 下の「[スマホでの利用について](#スマホでの利用について重要)」を先に読んでください。
-
----
-
-## スマホでの利用について（重要）
-
-主な用途はスマホとのことですが、2 つの制約があります。
-
-1. **Android 版 Chrome は拡張機能に対応していません。** 2026 年 10 月時点でも、設定やフラグで有効にする方法はありません。iOS 版 Chrome も同じです。
-2. **Translator API はデスクトップ版 Chrome 専用です。** Chrome の公式ドキュメントでは、Android・iOS はまだ対象外とされています。仮に拡張機能を動かせるブラウザがあっても、翻訳エンジンがありません。
-
-つまり「Chrome 拡張機能 + Translator API」の構成は **PC の Chrome でのみ** 動きます。
-スマホで、外部 API を使わずに同じことをするための代替構成の案は以下のとおりです。
-
-| 案 | 構成 | 翻訳エンジン（端末内） | 手間 | コメント |
-|---|---|---|---|---|
-| A | このリポジトリをそのまま PC の Chrome で使う | Chrome Translator API | 小 | すぐに使える。スマホでは使えない |
-| B | **iPhone：Safari Web Extension** にして、翻訳をネイティブ側に任せる | Apple の Translation フレームワーク | 中〜大 | Mac と Xcode が必要。自分の端末だけで使うなら App Store への公開は不要 |
-| C | **Android：自作のブラウザアプリ**（WebView）に `content.js` を注入する | Google ML Kit の端末内翻訳 | 中〜大 | Android Studio が必要。APK を自分の端末に直接インストールする |
-| D | Android 版 Edge の拡張機能 | なし（Translator API が使えるか不明） | — | Microsoft が選んだ拡張機能しか入れられず、自作は読み込めない。おすすめしない |
-
-`extension/src/content.js` は chrome.* API を使わず、翻訳部分を `backend` オブジェクト（`availability` / `create` / `translate`）にまとめてあります。B・C 案では、この `backend` をネイティブ側の翻訳を呼ぶ実装に差し替えれば、要素の検出・挿入・キャッシュ・動的追加への対応はそのまま流用できます。
-
-Vivaldi などの Android 向け Chromium 系ブラウザが Chrome ウェブストアの拡張機能に対応したという情報もありますが、確認できていません。対応していても Translator API が無ければこの拡張機能は動かないので（バナーに「Translator API が使えません」と表示されます）、試す場合はその前提でお願いします。
-
-どの端末（iPhone / Android）で使うかを教えてもらえれば、B か C の構成で作り直します。
+現在の収録作品：Oscar Wilde『The Selfish Giant（わがままな大男）』（1888）
 
 ---
 
-## Translator API を content script から使えるか（調査結果）
+## 使い方
 
-**結論：使えます。** この拡張機能は content script から直接 Translator API を呼んでいます。
-
-- Translator API は Chrome 138 からデスクトップ版で正式に使えます（Window に公開された Web API）。
-- content script が動く ISOLATED world からも `Translator` が見えることを、実際の Chromium（153）に拡張機能を読み込んで確認しました（`test/extension-smoke.cjs`）。ページ側（MAIN world）から拡張機能の内部状態は見えません。
-
-ただし、次の点に注意が必要です。この拡張機能ではそれぞれに対処しています。
-
-| 注意点 | 対処 |
+| 操作 | 動き |
 |---|---|
-| モデルの**ダウンロード開始**（`availability()` が `downloadable` / `downloading` のときの `Translator.create()`）には、ページ上での**ユーザー操作**が必要。ツールバーボタンのクリックはページ上の操作として扱われない | 画面下のバナーに「ダウンロードして翻訳」ボタンを出し、そのタップを起点に `create()` する。ダウンロード済み（`available`）なら操作は不要で、すぐに翻訳を始める |
-| ダウンロードの進捗は `monitor` の `downloadprogress` イベントで受け取る（`e.loaded` は 0〜1） | バナーに % と進捗バーを表示する。100% になった後は「読み込んでいます…」と表示する |
-| ページの `Permissions-Policy` で `translator` が禁止されていると使えない | エラー内容をバナーに表示する |
-| Translator API が無い環境では `Translator` 自体が未定義。Chromium（Chrome ブランドでないもの）では `Translator` は定義されているが `availability()` が応答しない | 未定義なら「使えません」と表示する。`availability()` は 10 秒でタイムアウトにする |
-| 他のオリジンの iframe 内では既定で使えない | トップレベルのフレームだけに注入する（iframe 内は翻訳しない） |
+| 単語をタップ | 画面下に意味と、その単語を含む 1 文を表示（単語は黄色で強調） |
+| 同じ単語をもう一度タップ | 単語帳に登録（同じ文の同じ単語は二重に登録しない） |
+| 単語・パネル以外をタップ、または × | パネルを閉じる |
+| 「ここまで読んだ」 | 1 段落目からその段落までを既読にする |
+| 最後に既読にした段落のボタンをもう一度押す | 1 段落ぶん取り消す（押し間違い用） |
+| 「和訳を隠す / 表示」 | 日本語訳の表示を切り替える（設定は保存される） |
+| 上の「単語帳」 | 登録した単語の一覧（新しい順）。「削除」で消せる |
 
-もし今後の Chrome で content script から使えなくなった場合の代替構成は次の 2 つです。
+### 単語の数え方
 
-1. **Offscreen Document** で `Translator` を持ち、content script ⇔ service worker ⇔ offscreen を `chrome.runtime` のメッセージでつなぐ。ダウンロード時のユーザー操作は、拡張機能のポップアップやオプションページで取る（モデルはブラウザ全体で共有される）。
-2. **サイドパネル**（`chrome.sidePanel`）で翻訳を実行する。サイドパネル内のボタンでユーザー操作も取れる。
+- 「ここまで読んだ」で既読にした段落の英単語を数えます。同じ段落を何度既読にしても二重には数えません。
+- **単語の種類**は大文字・小文字を区別せず、所有格の `'s` は外して数えます（`Giant's` と `giant` は同じ）。`run` と `ran` のような活用形は別の単語として数えます。
+- `peach-trees` のようなハイフンでつながった語は `peach` と `trees` の 2 語として数えます。
 
-いずれの場合も `content.js` の `backend` をメッセージ送信に置き換えるだけで済みます。
+### 記録が消えるとき
+
+記録はブラウザのサイトデータとして保存されます。次の場合は消えるので注意してください。
+
+- Chrome の「閲覧履歴データの削除」で **Cookie とサイトデータ** を消したとき
+- アプリを開いたことのあるアドレス（URL）を変えたとき（保存場所はアドレスごとに分かれています）
+
+ホーム画面に追加しておくと、ブラウザの容量整理で自動的に消されにくくなります。
 
 ---
 
-## ファイル構成
+## スマホで使えるようにする（公開）
 
+スマホで使うには、`web/` フォルダを HTTPS のサイトとして公開する必要があります。サーバー側の処理は一切ない静的なファイルだけなので、無料で公開できます。どちらか 1 つを選んでください。
+
+### A. Cloudflare Pages（リポジトリを非公開のまま使える）
+
+1. [Cloudflare](https://dash.cloudflare.com/) に登録し、**Workers & Pages → 作成 → Pages → Git に接続** でこのリポジトリを選びます。
+2. ビルドの設定は **フレームワーク：なし**、**ビルドコマンド：空欄**、**出力ディレクトリ：`web`** にします。
+3. 公開されたアドレス（`https://<名前>.pages.dev`）をスマホの Chrome で開きます。
+
+### B. GitHub Pages（無料プランではリポジトリの公開が必要）
+
+1. リポジトリを公開（Public）にします。
+2. GitHub Pages はフォルダとしてルートか `/docs` しか選べないため、`web/` を公開する GitHub Actions のワークフローを追加します（この方法を選ぶ場合はこちらで追加します）。
+3. **Settings → Pages** で公開元を **GitHub Actions** にします。
+
+### ホーム画面に追加する
+
+1. スマホの Chrome で公開したアドレスを開きます。
+2. 右上の「︙」→ **ホーム画面に追加**（または「アプリをインストール」）を選びます。
+3. 以後はホーム画面のアイコンから開けます。アドレスバーのない、アプリのような画面で開きます。
+
+---
+
+## PC で動作確認する
+
+```sh
+python3 -m http.server -d web 8000
+# ブラウザで http://localhost:8000 を開く
 ```
-extension/                ← Chrome に読み込むのはこのフォルダだけ
-  manifest.json
-  src/background.js       ボタンが押されたらタブに CSS と content script を注入し、バッジを更新する
-  src/content.js          日本語ブロックの検出、翻訳、英訳の挿入、表示切り替え、進捗バナー
-  src/content.css         英訳ブロックとバナー外枠のスタイル
-  icons/
-test/
-  run.cjs                 content script の自動テスト（Translator API はモック）
-  extension-smoke.cjs     拡張機能を実際の Chromium に読み込むテスト
-  fixture.html            テスト用ページ（手動確認にも使える）
-  mock-translator.js      テスト用 Translator API モック
-```
 
----
+ファイルを直接開く（`file://`）と本文を読み込めないので、必ずこのようにローカルサーバー経由で開いてください。Chrome の DevTools でスマホ表示（Ctrl+Shift+M）にすると、スマホに近い見た目で確認できます。
 
-## 読み込み手順（PC の Chrome）
+### 確認すること
 
-前提：**デスクトップ版 Chrome 138 以降**（Windows / macOS / Linux / ChromeOS）。
-
-1. このリポジトリをクローンするか、ZIP をダウンロードして展開します。
-2. Chrome で `chrome://extensions` を開きます。
-3. 右上の **デベロッパーモード** をオンにします。
-4. **パッケージ化されていない拡張機能を読み込む** を押し、このリポジトリの **`extension` フォルダ** を選びます（リポジトリのルートではありません）。
-5. ツールバーのパズルアイコンから「Reading English (ja→en)」をピン留めすると押しやすくなります。
-
-コードを変更したら、`chrome://extensions` でこの拡張機能の再読み込みボタン（↻）を押し、対象のページも再読み込みしてください。
-
-ショートカット：`Alt+Shift+E`（`chrome://extensions/shortcuts` で変更できます）。
-
----
-
-## 動作確認方法
-
-### 手動で確認する
-
-1. 日本語のニュース記事やブログを開きます。
-2. ツールバーの **EN** ボタンを押します。
-3. **初回のみ**：画面下に「翻訳モデル（日本語→英語）のダウンロードが必要です」と表示されます。**「ダウンロードして翻訳」** を押すと、進捗（%）とバーが表示されます。完了すると「翻訳の準備ができました」と表示され、少しして消えます。
-4. 段落や見出しの直下に、青い帯の付いた小さめの英訳が表示されることを確認します。ボタンには **EN** のバッジが付きます。
-5. もう一度ボタンを押すと英訳が消え、バッジも消えます。さらに押すと再表示されます。
-6. 下にスクロールすると、画面に近づいた段落から順に英訳が付くことを確認します。無限スクロールのサイト（SNS やまとめサイトなど）では、新しく読み込まれた投稿にも英訳が付きます。
-7. 検索欄やコメント欄などの入力欄、コードブロック、ナビゲーションメニューには英訳が付かないことを確認します。
-8. 2 回目以降は（別のサイトでも）ダウンロードの案内は出ず、すぐに翻訳が始まります。
-
-テスト用ページで確認する場合は `chrome://extensions` でこの拡張機能の「詳細」から **ファイルの URL へのアクセスを許可する** をオンにし、`test/fixture.html` を開いてボタンを押してください。
-
-うまく動かないとき：
-
-- バナーに「Translator API が使えません」→ Chrome のバージョンを `chrome://version` で確認してください（138 以降が必要）。Chromium や一部の派生ブラウザでは使えません。
-- ボタンを押すとバッジが **×** になる → `chrome://` のページや Chrome ウェブストアなど、拡張機能が動けないページです。
-- 詳しいログは、対象ページの DevTools のコンソール（content script のエラー）と、`chrome://extensions` の「Service Worker」リンク（background.js のエラー）で確認できます。
+1. 本棚に「The Selfish Giant」があり、数字がすべて 0 になっている。
+2. 作品を開き、単語をタップすると、下に意味と文が出る。別の単語をタップすると切り替わる。
+3. 同じ単語をもう一度タップすると「単語帳に登録しました」と出て、「単語帳」の画面に表示される。
+4. 2 段落目の「ここまで読んだ」を押して本棚に戻ると、読んだ単語数と単語の種類が増えている。
+5. ページを再読み込みしても、2〜4 の記録が残っている。
+6. もう一度作品を開くと、3 段落目から表示される。
 
 ### 自動テスト
 
@@ -129,44 +93,82 @@ Node.js 18 以降で次を実行します。
 ```sh
 npm install
 npx playwright install chromium
-npm test                 # content script のテスト（モックの Translator API）
-npm run test:extension   # 実際の Chromium に拡張機能を読み込むテスト
+npm test
 ```
 
-`npm test` では、日本語ブロックへの挿入、スキップ対象、入れ子のブロック、表示切り替え、キャッシュ、動的な追加・書き換え、画面外の遅延翻訳、初回ダウンロード時のボタンと進捗表示、API が無い場合のエラー表示を確認します。
-本物の翻訳モデルは Chrome 本体にしか入っていないため、実際の訳文は手動で確認してください。
+スマホと同じ画面サイズのブラウザで実際に操作し、次のことを確認します。
+
+- 全段落の全単語に意味が用意されているか
+- 単語のタップで意味と文が出るか、2 回目のタップで登録されるか（重複登録しないか）
+- 既読にした段落の単語数・種類数が正しいか、取り消せるか、再読み込み後も残るか
+- 和訳の表示設定が保存されるか
+- オフラインで開けるか
+- ページ内でエラー（CSP 違反を含む）が出ていないか
 
 ---
 
-## セキュリティ上の配慮
+## セキュリティ
 
-- **権限は最小限**：`activeTab` と `scripting` だけです。`host_permissions` や `<all_urls>` は要求しないので、ボタンを押したタブにだけ、押したときにだけアクセスします。閲覧履歴やタブの URL は読みません。
-- **外部通信なし**：翻訳はブラウザ内の Translator API だけで行います。リモートのスクリプトも読み込みません。拡張機能ページの CSP は `script-src 'self'; object-src 'none'` です。
-- **ページの内容を保存しない**：翻訳キャッシュはそのタブのメモリ上だけにあり、ページを閉じれば消えます。`chrome.storage` やディスクには書きません。
-- **XSS 対策**：英訳やメッセージは `textContent` で挿入し、`innerHTML` は使いません。
-- **ページからの隔離**：content script は ISOLATED world で動くので、ページ側の JavaScript からは内部状態や関数を触れません。バナーは閉じた Shadow DOM の中に作るので、ページ側から中身を操作できません。スタイルは Constructable Stylesheet で当てるので、ページの CSP に左右されません。
-- **入力欄に触れない**：`input` / `textarea` / `contenteditable` の中は読みも書きもしないので、入力中の文章が翻訳に渡ることはありません。
-
----
-
-## 既知の制限と調整ポイント
-
-調整したい値は `extension/src/content.js` の先頭「設定」にまとめてあります。
-
-- `BLOCK_SELECTOR`：英訳を付ける単位。`div` や `section` も含むので、`div` の中に直接書かれた文章にも英訳が付きます。
-- `SKIP_SELECTOR`：翻訳しない要素。メニューやボタンの英訳が邪魔なら、ここにセレクタを足してください。
-- `MIN_JAPANESE_CHARS`：日本語がこの文字数未満のブロックは翻訳しません（既定は 2）。
-- `MAX_CHUNK_CHARS`：長い段落はこの文字数ごとに文単位で分けて翻訳します。
-- iframe の中は翻訳しません。
-- React などのフレームワークで作られたページでは、英訳を差し込んだことで表示が崩れることがまれにあります。その場合はボタンで非表示にしてください。
-- ページを移動するとオフに戻ります（ボタンを押したページでだけ動く設計のため）。
+- **サーバーなし・外部通信なし**：アプリは自分のサイトのファイルだけを読み込みます。外部のスクリプト、フォント、アクセス解析などは使いません。
+- **記録は端末の中だけ**：読書記録と単語帳はブラウザの localStorage にだけ保存し、どこにも送信しません。
+- **Content Security Policy**：自分のサイト以外からのスクリプト・スタイル・画像の読み込みと、インラインスクリプトを禁止しています。
+- **XSS 対策**：本文や単語帳の表示はすべて `textContent` 相当で行い、`innerHTML` は使いません。
+- **秘密の情報がない**：API キーなどは存在しないので、公開しても漏れるものがありません。
 
 ---
 
-## 参考
+## ファイル構成
 
-- [Translation with built-in AI（Chrome for Developers）](https://developer.chrome.com/docs/ai/translator-api)
-- [Client-side translation with AI（Chrome for Developers）](https://developer.chrome.com/docs/ai/translate-on-device)
-- [Translator and Language Detector APIs（MDN）](https://developer.mozilla.org/en-US/docs/Web/API/Translator_and_Language_Detector_APIs)
-- [How to Get Chrome Extensions on Android in 2026](https://www.itechguides.com/how-to-get-chrome-extensions-on-android-what-works-in-2026/)
-- [Microsoft Edge for Android の拡張機能対応（9to5Google）](https://9to5google.com/2025/03/14/microsoft-edge-has-an-extension-store/)
+```
+web/                        ← 公開するのはこのフォルダだけ
+  index.html
+  app.js                    画面・単語タップ・単語帳・読書記録・単語数の計算
+  style.css
+  sw.js                     オフライン対応（Service Worker）
+  manifest.webmanifest      ホーム画面に追加するための設定
+  icon-192.png, icon-512.png
+  texts/
+    index.json              本棚に並べる作品の一覧
+    common.json             どの作品でも使う基本語の意味（the, of など）
+    selfish-giant.json      作品ごとの本文・和訳・語釈
+test/web.cjs                ウェブアプリの自動テスト
+extension/                  旧版の Chrome 拡張機能（PC 用。extension/README.md を参照）
+```
+
+### 作品データの形式
+
+```jsonc
+{
+  "id": "selfish-giant",            // ファイル名と同じ
+  "title": "The Selfish Giant",
+  "titleJa": "わがままな大男",
+  "author": "Oscar Wilde",
+  "year": 1888,
+  "source": "Project Gutenberg eBook #902 …",
+  "paragraphs": [
+    {
+      "en": "EVERY afternoon, as they were coming from school, …",  // 原文
+      "ja": "毎日午後、学校から帰る途中、…",                          // 和訳
+      "g": { "afternoon": "午後", "used": "（used to で）以前はよく〜したものだ" }  // この段落での語義
+    }
+  ]
+}
+```
+
+単語の意味は、その段落の `g` → `common.json` の順に探します。キーは小文字で、所有格は `giant's` のまま書いても `giant` でも見つかります。
+同じ単語でも段落ごとに意味を書き分けられるので、文脈に合った意味を表示できます。
+
+### 作品を追加するには
+
+1. [Project Gutenberg](https://www.gutenberg.org/) などから、著作権の切れた英語の原文を選びます。
+2. 段落ごとに和訳と語義（`g`）を付けた JSON を `web/texts/` に置き、`web/texts/index.json` に 1 行追加します。
+3. `npm test` で、全単語に意味が付いているかを確認します。
+
+和訳と語義の作成は手間がかかるので、作品名を指定してもらえれば、こちらで作って追加します。
+
+---
+
+## 出典
+
+- Oscar Wilde, “The Selfish Giant”, *The Happy Prince and Other Tales* (1888). 本文は [Project Gutenberg eBook #902](https://www.gutenberg.org/ebooks/902) より（パブリックドメイン）。
+- 和訳と語義はこのアプリ用に新しく作成したものです。
