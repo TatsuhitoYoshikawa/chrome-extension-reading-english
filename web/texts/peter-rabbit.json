@@ -90,7 +90,7 @@
   },
   {
    "en": "Then old Mrs. Rabbit took a basket and her umbrella, and went through the wood to the baker's. She bought a loaf of brown bread and five currant buns.",
-   "ja": "それからラビットおくさんは、かごとかさを持って、森をぬけてパン屋さんへ行きました。そして黒パンをひとかたまりと、干しぶどう入りの丸パンを五つ買いました。",
+   "ja": "それから年とったラビットおくさんは、かごとかさを持って、森をぬけてパン屋さんへ行きました。そして黒パンをひとかたまりと、干しぶどう入りの丸パンを五つ買いました。",
    "g": {
     "old": "年とった",
     "mrs": "〜夫人・〜おくさん（既婚女性の敬称）",
@@ -128,7 +128,7 @@
   },
   {
    "en": "But Peter, who was very naughty, ran straight away to Mr. McGregor's garden, and squeezed under the gate!",
-   "ja": "ところがピーターは、とてもいたずらっ子だったので、まっすぐマグレガーさんの畑へかけていき、門の下をむりやりくぐりぬけたのです！",
+   "ja": "ところが、とてもいたずらっ子のピーターは、すぐさまマグレガーさんの畑へかけていき、門の下をむりやりくぐりぬけたのです！",
    "g": {
     "peter": "ピーター（うさぎの名前・この話の主人公）",
     "naughty": "いたずらな・言うことをきかない",
@@ -170,12 +170,12 @@
   },
   {
    "en": "But round the end of a cucumber frame, whom should he meet but Mr. McGregor!",
-   "ja": "ところが、きゅうりの苗床の角をまがったところで、ばったり出会ったのは、なんとマグレガーさんだったのです！",
+   "ja": "ところが、きゅうりの温床のはしをまがったところで、ばったり出会ったのは、なんとマグレガーさんだったのです！",
    "g": {
     "round": "〜を回って（角を曲がって）",
     "end": "はし・角",
     "cucumber": "きゅうり",
-    "frame": "（cucumber frame で）きゅうりの苗床（ガラスのふたつきの温床）",
+    "frame": "（cucumber frame で）きゅうりの温床（ガラスのふたをかぶせた木わくの苗床）",
     "whom": "誰に（whom should he meet but A で なんとAに出会った）",
     "should": "（驚きを表して）なんと〜するとは",
     "meet": "出会う",
@@ -257,7 +257,7 @@
     "that": "（so that で）その結果〜",
     "think": "思う",
     "might": "（might have got away で）逃げられたかもしれない",
-    "got": "（get away で 逃げる／get caught で 引っかかる）（get の過去分詞）",
+    "got": "（might have got away で 逃げられた：get の過去分詞／got caught で 引っかかった：get の過去形）",
     "away": "（get away で）逃げきる",
     "altogether": "すっかり・完全に",
     "if": "（if he had not ... で）もし〜しなかったら（過去の仮定）",
@@ -276,11 +276,11 @@
   },
   {
    "en": "Peter gave himself up for lost, and shed big tears; but his sobs were overheard by some friendly sparrows, who flew to him in great excitement, and implored him to exert himself.",
-   "ja": "ピーターはもうだめだとあきらめて、大つぶの涙をこぼしました。けれども、そのすすり泣きを親切なスズメたちが聞きつけ、ひどくあわてて飛んできて、がんばるようにと必死にはげましました。",
+   "ja": "ピーターはもうだめだとあきらめて、大つぶの涙をこぼしました。けれども、そのすすり泣きを親切なスズメたちが聞きつけ、ひどく興奮して飛んできて、力をふりしぼってがんばってと、けんめいにたのみました。",
    "g": {
     "peter": "ピーター（うさぎの名前・この話の主人公）",
     "gave": "（give oneself up for lost で）もうだめだとあきらめた（give の過去形）",
-    "himself": "自分自身を",
+    "himself": "自分自身を（give himself up / exert himself の himself）",
     "up": "（give ... up for lost で）あきらめる",
     "for": "（give ... up for lost で）〜とみなして",
     "lost": "（for lost で）助からないものとして（lose の過去分詞）",
@@ -410,7 +410,7 @@
   },
   {
    "en": "Peter sat down to rest; he was out of breath and trembling with fright, and he had not the least idea which way to go. Also he was very damp with sitting in that can.",
-   "ja": "ピーターはすわりこんでひと休みしました。息は切れ、こわさでぶるぶるふるえていて、どちらへ行けばいいのかまるで見当がつきませんでした。それに、あのじょうろの中にすわっていたせいで、体がすっかりぬれていました。",
+   "ja": "ピーターはすわりこんでひと休みしました。息は切れ、こわさでぶるぶるふるえていて、どちらへ行けばいいのかまるで見当がつきませんでした。それに、あのじょうろの中にすわっていたせいで、体がひどくしめっていました。",
    "g": {
     "peter": "ピーター（うさぎの名前・この話の主人公）",
     "sat": "すわった（sit の過去形。sit down で すわりこむ）",
@@ -426,7 +426,7 @@
     "way": "方向・道（which way to go で どちらへ行けばよいか）",
     "go": "行く",
     "also": "それに・また",
-    "damp": "しめった・ぬれた",
+    "damp": "しめった・じめじめした",
     "sitting": "すわっていたこと（sit の -ing 形）",
     "can": "じょうろ（watering can）"
    }
@@ -450,7 +450,7 @@
   },
   {
    "en": "He found a door in a wall; but it was locked, and there was no room for a fat little rabbit to squeeze underneath.",
-   "ja": "へいにとびらを見つけましたが、かぎがかかっていて、太った小さなうさぎがもぐりこめるすき間もありませんでした。",
+   "ja": "へいにとびらを見つけましたが、かぎがかかっていて、太った小さなうさぎが体を押しこんで下をくぐれるすき間もありませんでした。",
    "g": {
     "found": "見つけた（find の過去形）",
     "door": "とびら・戸",
@@ -466,7 +466,7 @@
   },
   {
    "en": "An old mouse was running in and out over the stone doorstep, carrying peas and beans to her family in the wood. Peter asked her the way to the gate, but she had such a large pea in her mouth that she could not answer. She only shook her head at him. Peter began to cry.",
-   "ja": "年とったネズミが一ぴき、石の戸口の段を出たり入ったりしながら、森にいる家族のもとへ豆を運んでいました。ピーターは門へ行く道をたずねましたが、ネズミは口に大きな豆をくわえていたので、答えることができません。ただピーターに向かって首を横にふるだけでした。ピーターは泣きだしてしまいました。",
+   "ja": "年とったネズミが一ぴき、石の戸口の段を出たり入ったりしながら、森にいる家族のもとへえんどう豆やいんげん豆を運んでいました。ピーターは門へ行く道をたずねましたが、ネズミは口に大きなえんどう豆をくわえていたので、答えることができません。ただピーターに向かって首を横にふるだけでした。ピーターは泣きだしてしまいました。",
    "g": {
     "old": "年とった",
     "mouse": "ネズミ",
@@ -478,7 +478,7 @@
     "doorstep": "戸口の踏み段",
     "carrying": "運んで（carry の -ing 形）",
     "peas": "えんどう豆（pea の複数形）",
-    "beans": "豆（bean の複数形）",
+    "beans": "豆・いんげん豆（bean の複数形）",
     "she": "彼女は（ここではネズミを指す）",
     "family": "家族",
     "wood": "森",
@@ -626,7 +626,7 @@
   },
   {
    "en": "Mr. McGregor caught sight of him at the corner, but Peter did not care. He slipped underneath the gate, and was safe at last in the wood outside the garden.",
-   "ja": "マグレガーさんは角のところでピーターを見つけましたが、ピーターはかまいませんでした。門の下をするりとくぐりぬけて、とうとう畑の外の森に出て、助かったのです。",
+   "ja": "マグレガーさんは角のところでピーターを見つけましたが、ピーターはもう気にしませんでした。門の下をするりとくぐりぬけて、とうとう畑の外の森に出て、助かったのです。",
    "g": {
     "mr": "〜さん（男性の敬称）",
     "mcgregor": "マグレガー（人の名前。畑の持ち主）",
@@ -682,7 +682,7 @@
   },
   {
    "en": "He was so tired that he flopped down upon the nice soft sand on the floor of the rabbit-hole and shut his eyes. His mother was busy cooking; she wondered what he had done with his clothes. It was the second little jacket and pair of shoes that Peter had lost in a fortnight!",
-   "ja": "ピーターはとても疲れていたので、うさぎ穴の床の、やわらかで気持ちのいい砂の上にばったりたおれこんで、目をつぶりました。お母さんは料理でいそがしくしていましたが、ピーターは服をどうしてしまったのかしらと思いました。ピーターが二週間のうちに上着と靴をなくしたのは、これで二度目だったのです！",
+   "ja": "ピーターはとても疲れていたので、うさぎ穴の床の、やわらかで気持ちのいい砂の上にばったりたおれこんで、目をつぶりました。お母さんは料理でいそがしくしていましたが、この子は服をどうしてしまったのかしらと思いました。ピーターが二週間のうちに上着と靴をなくしたのは、これで二度目だったのです！",
    "g": {
     "so": "（so ... that で）とても〜なので",
     "tired": "疲れた（tire の過去分詞）",

@@ -17,7 +17,7 @@
     "come": "（have come で）来た・やって来た（come の過去分詞）",
     "down": "（come down to で）〜へやって来る",
     "beach": "浜辺・砂浜",
-    "grandpa": "おじいちゃん",
+    "grandpa": "おじいさん・おじいちゃん",
     "live": "住んでいる",
     "town": "町",
     "near": "〜の近くの",
@@ -28,7 +28,7 @@
    "en": "Their grandpa likes to sit on the large rock, and watch the big ships as they sail far away on the blue sea. Sometimes he sits there all day long.",
    "ja": "おじいさんは大きな岩に座って、青い海のはるか遠くへ大きな船が進んでいくのをながめるのが好きです。ときには一日じゅうそこに座っていることもあります。",
    "g": {
-    "grandpa": "おじいちゃん",
+    "grandpa": "おじいさん・おじいちゃん",
     "likes": "好む（like to で 〜するのが好き；like の3人称単数現在形）",
     "sit": "座る",
     "large": "大きな",
@@ -89,7 +89,7 @@
   },
   {
    "en": "They have been picking up shells for their little sister. She is too young to come to the beach.",
-   "ja": "二人は小さな妹のために貝がらを拾い集めているところです。妹はまだ小さすぎて、浜辺に来ることができません。",
+   "ja": "二人はさっきから、小さな妹のために貝がらを拾い集めています。妹はまだ小さすぎて、浜辺に来ることができません。",
    "g": {
     "picking": "（pick up で）拾う（have been picking で ずっと拾っている；pick の -ing 形）",
     "shells": "貝がら（shell の複数形）",
@@ -151,12 +151,12 @@
   },
   {
    "en": "The boy said, \"Only fifty cents, sir.\"",
-   "ja": "男の子は「たった50セントです」と言いました。",
+   "ja": "男の子は「たったの50セントです、だんなさん」と言いました。",
    "g": {
     "only": "たった〜だけ",
     "fifty": "50の",
     "cents": "セント（cent の複数形；1ドルの100分の1）",
-    "sir": "（男性へのていねいな呼びかけ）だんなさま"
+    "sir": "（男性へのていねいな呼びかけ）だんなさん・だんなさま"
    }
   },
   {
@@ -187,7 +187,7 @@
   },
   {
    "en": "He gives them bread and grass to eat. They like grass, and will take it from his hand. He has called in a little friend to see them.",
-   "ja": "ウィリーはウサギにパンと草を食べさせます。ウサギは草が好きで、ウィリーの手から草を食べます。ウィリーは小さな友だちを呼んで、ウサギを見せてあげています。",
+   "ja": "ウィリーはウサギにパンと草を食べさせます。ウサギは草が好きで、ウィリーの手から草を受け取って食べます。ウィリーは小さな友だちを呼んで、ウサギを見せてあげています。",
    "g": {
     "gives": "与える（give の3人称単数現在形）",
     "bread": "パン",
@@ -195,7 +195,7 @@
     "eat": "食べる",
     "like": "好む",
     "will": "（習性を表して）〜するものだ",
-    "take": "受け取る・（手から）食べる",
+    "take": "受け取る（ここでは手から受け取って食べる）",
     "hand": "手",
     "called": "（call in で）呼び入れた（call の過去分詞）",
     "friend": "友だち",
@@ -366,7 +366,7 @@
   },
   {
    "en": "\"Why, Willie, what ugly little things! What big mouths they have, and no feathers!\"",
-   "ja": "「まあ、ウィリー、なんてみっともない小さなものたちでしょう！なんて大きな口をしているの、それに羽が一本もないわ！」",
+   "ja": "「まあ、ウィリー、なんてみにくい小さな生き物たちでしょう！なんて大きな口をしているの、それに羽が一本もないわ！」",
    "g": {
     "why": "まあ・おや（驚きを表す）",
     "willie": "ウィリー（男の子の名前）",
@@ -427,7 +427,7 @@
     "dead": "死んでいる",
     "dear": "やさしい・大切な",
     "old": "年老いた",
-    "grandma": "おばあちゃん",
+    "grandma": "おばあさん・おばあちゃん",
     "took": "（take care of で）〜の世話をした（take の過去形）",
     "care": "（take care of で）世話",
     "tried": "（try to で）〜しようと努めた（try の過去形）",
@@ -437,7 +437,7 @@
   },
   {
    "en": "Every day, Mary's mother filled Frank's basket with bread and meat, and a little tea for his grandma.",
-   "ja": "毎日、メアリーのお母さんはフランクのかごにパンと肉、それにおばあさんのために少しのお茶を入れてあげました。",
+   "ja": "毎日、メアリーのお母さんはフランクのかごをパンと肉でいっぱいにして、おばあさんのために少しお茶も入れてあげました。",
    "g": {
     "day": "（every day で）毎日",
     "mary's": "メアリーの",
@@ -448,7 +448,7 @@
     "bread": "パン",
     "meat": "肉",
     "tea": "お茶",
-    "grandma": "おばあちゃん"
+    "grandma": "おばあさん・おばあちゃん"
    }
   },
   {
@@ -471,7 +471,7 @@
   },
   {
    "en": "\"Well, then, let us whistle it to sleep.\" And Frank, taking a willow whistle out of his pocket, blew a long note.",
-   "ja": "「それじゃあ、口笛で寝かしつけてあげよう。」そう言ってフランクは、ポケットから柳の笛を取り出して、長い音を一つ吹きました。",
+   "ja": "「それじゃあ、笛を吹いて寝かしつけてあげよう。」そう言ってフランクは、ポケットから柳の笛を取り出して、長い音を一つ吹きました。",
    "g": {
     "well": "それじゃあ・さて",
     "let": "（let us で）〜しよう",
@@ -577,7 +577,7 @@
   },
   {
    "en": "\"There!\" cried Frank, \"I told you the way to put a doll to sleep, is to whistle to it.\"",
-   "ja": "「ほらね！」とフランクは叫びました。「人形を寝かしつけるには、口笛を吹いてやればいいって言ったでしょう。」",
+   "ja": "「ほらね！」とフランクは叫びました。「人形を寝かしつけるには、笛を吹いてやればいいって言っただろう。」",
    "g": {
     "cried": "叫んだ（cry の過去形）",
     "frank": "フランク（男の子の名前）",
@@ -586,7 +586,7 @@
     "put": "（put ... to sleep で）…を寝かしつける",
     "doll": "人形",
     "sleep": "眠り（to sleep で 眠りにつかせる）",
-    "whistle": "口笛を吹く・笛を吹いてやる"
+    "whistle": "（whistle to で）…に笛を吹いてやる"
    }
   },
   {
@@ -617,7 +617,7 @@
   },
   {
    "en": "There was once a big, white hen that had twelve little chickens. They were very small, and the old hen took good care of them. She found food for them in the daytime, and at night kept them under her wings.",
-   "ja": "むかし、大きな白いめんどりがいて、十二羽の小さなひよこを飼っていました。ひよこたちはとても小さかったので、めんどりはよく面倒をみていました。昼間はひよこたちのために食べ物を見つけてやり、夜には自分の翼の下に入れて守ってやりました。",
+   "ja": "むかし、十二羽の小さなひよこを連れた、大きな白いめんどりがいました。ひよこたちはとても小さく、めんどりはよく面倒をみていました。昼間はひよこたちのために食べ物を見つけてやり、夜には自分の翼の下に入れて守ってやりました。",
    "g": {
     "once": "むかし・かつて",
     "big": "大きな",
@@ -737,7 +737,7 @@
   },
   {
    "en": "\"Yes you can, if you try,\" said the old hen. \"Just flap your wings, as I did, and you can jump over.\"",
-   "ja": "「いいえ、やってみればできますよ」とめんどりは言いました。「わたしがしたように翼をばたばたさせれば、跳び越えられるわ。」",
+   "ja": "「いいえ、やってみればできますよ」とめんどりは言いました。「わたしがしたように翼をばたばたさせさえすれば、跳び越えられるわ。」",
    "g": {
     "yes": "いいえ（相手の否定を打ち消して）できますよ",
     "try": "やってみる",
@@ -753,7 +753,7 @@
   },
   {
    "en": "\"I am flapping my wings,\" said Chippy, who stood by himself; \"but I can't jump any better than I could before.\"",
-   "ja": "「ぼく、翼をばたばたさせてるよ」と、ひとりで離れて立っていたチッピーが言いました。「でも前よりうまく跳べないよ。」",
+   "ja": "「ぼく、翼をばたばたさせてるよ」と、ひとりで離れて立っていたチッピーが言いました。「でも前より少しもうまく跳べないよ。」",
    "g": {
     "flapping": "ばたばたさせている（flap の -ing 形）",
     "wings": "翼（wing の複数形）",
@@ -797,7 +797,7 @@
   },
   {
    "en": "\"Well,\" said the old hen, \"I must give it up.\" So she jumped back to the bank, and walked slowly home with her brood.",
-   "ja": "「しかたがないわね」とめんどりは言いました。「あきらめるしかないわ。」そこでめんどりは岸へ跳んでもどり、ひなたちを連れてゆっくりと家へ歩いて帰りました。",
+   "ja": "「しかたがないわね」とめんどりは言いました。「あきらめるしかないわ。」そこでめんどりは岸へ跳んでもどり、ひよこたちを連れてゆっくりと家へ歩いて帰りました。",
    "g": {
     "well": "まあ・しかたない",
     "old": "（old hen で）母鳥",
@@ -809,7 +809,7 @@
     "walked": "歩いた（walk の過去形）",
     "slowly": "ゆっくりと",
     "home": "家へ",
-    "brood": "（一度にかえった）ひなたち"
+    "brood": "（一度にかえった）ひなたち・ひよこたち"
    }
   },
   {
