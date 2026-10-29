@@ -17,6 +17,12 @@ const TYPES = {
   '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png',
 };
 
+// render.yaml の全ページ共通ヘッダー（Strict-Transport-Security は http では無意味なので除く）
+const RENDER_HEADERS = [...fs.readFileSync(path.join(__dirname, '../render.yaml'), 'utf8')
+  .matchAll(/- path: \/\*\n\s+name: (\S+)\n\s+value: "?([^"\n]+)"?/g)]
+  .map((m) => [m[1], m[2]])
+  .filter(([name]) => name !== 'Strict-Transport-Security');
+
 function serve() {
   const server = http.createServer((req, res) => {
     const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/^\/+/, '') || 'index.html';
@@ -26,6 +32,7 @@ function serve() {
       return res.end();
     }
     res.setHeader('content-type', TYPES[path.extname(file)] ?? 'application/octet-stream');
+    for (const [name, value] of RENDER_HEADERS) res.setHeader(name, value); // 本番（Render）と同じヘッダー
     res.end(fs.readFileSync(file));
   });
   return new Promise((r) => server.listen(0, '127.0.0.1', () => r(server)));
@@ -82,6 +89,15 @@ const tests = {
         }
       });
     }
+  },
+
+  'Render config serves web/ with the same CSP as index.html'() {
+    const yaml = fs.readFileSync(path.join(__dirname, '../render.yaml'), 'utf8');
+    assert.match(yaml, /staticPublishPath: \.\/web/);
+    const header = yaml.match(/name: Content-Security-Policy\s+value: "([^"]+)"/)[1];
+    const meta = fs.readFileSync(path.join(WEB, 'index.html'), 'utf8')
+      .match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)[1];
+    assert.equal(header, `${meta}; frame-ancestors 'none'`);
   },
 
   async 'tap a word to see its meaning, tap again to save it'({ page, url }) {

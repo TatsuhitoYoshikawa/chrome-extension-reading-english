@@ -1,0 +1,36 @@
+# Render の Blueprint（静的サイトとして web/ フォルダをそのまま公開する）
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    runtime: static
+    name: bilingual-reader
+    buildCommand: echo "no build step"
+    staticPublishPath: ./web
+    pullRequestPreviewsEnabled: false
+    headers:
+      # index.html の <meta> と同じ内容。HTTP ヘッダーでしか効かない frame-ancestors を足している
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: Permissions-Policy
+        value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+      - path: /*
+        name: Strict-Transport-Security
+        value: max-age=31536000
+      # 更新がすぐ届くように、Service Worker とアプリ本体は毎回確認させる
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
+      - path: /*.js
+        name: Cache-Control
+        value: no-cache
+      - path: /*.json
+        name: Cache-Control
+        value: no-cache
