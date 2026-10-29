@@ -1,9 +1,44 @@
 [
   {
+    "id": "mcguffey-first-reader",
+    "level": "A1",
+    "title": "McGuffey's First Eclectic Reader (Lessons LIII–LXII)",
+    "titleJa": "マガフィー第一読本（抜粋）",
+    "author": "William Holmes McGuffey"
+  },
+  {
+    "id": "peter-rabbit",
+    "level": "A2",
+    "title": "The Tale of Peter Rabbit",
+    "titleJa": "ピーターラビットのおはなし",
+    "author": "Beatrix Potter"
+  },
+  {
     "id": "selfish-giant",
+    "level": "B1",
     "title": "The Selfish Giant",
     "titleJa": "わがままな大男",
-    "author": "Oscar Wilde",
-    "level": "B1"
+    "author": "Oscar Wilde"
+  },
+  {
+    "id": "silk-stockings",
+    "level": "B2",
+    "title": "A Pair of Silk Stockings",
+    "titleJa": "絹のストッキング",
+    "author": "Kate Chopin"
+  },
+  {
+    "id": "gift-of-the-magi",
+    "level": "C1",
+    "title": "The Gift of the Magi",
+    "titleJa": "賢者の贈り物",
+    "author": "O. Henry"
+  },
+  {
+    "id": "masque-of-the-red-death",
+    "level": "C2",
+    "title": "The Masque of the Red Death",
+    "titleJa": "赤死病の仮面",
+    "author": "Edgar Allan Poe"
   }
 ]

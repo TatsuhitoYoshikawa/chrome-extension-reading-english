@@ -100,6 +100,42 @@ const tests = {
     assert.equal(header, `${meta}; frame-ancestors 'none'`);
   },
 
+  'every word has common meanings in the dictionary'() {
+    const dict = readJson('texts/dict.json');
+    const missing = new Set();
+    for (const { id } of readJson('texts/index.json')) {
+      for (const w of tokens(readJson(`texts/${id}.json`))) {
+        const e = dict[lemma(w)];
+        if (!e?.m?.length) missing.add(lemma(w));
+        for (const pair of e?.i ?? []) assert.equal(pair.length, 2, `idiom of ${lemma(w)}`);
+      }
+    }
+    assert.deepEqual([...missing].slice(0, 20), [], `${missing.size} lemmas have no dictionary entry`);
+  },
+
+  async 'shelf is grouped by CEFR level from A1 to C2'({ page, url }) {
+    await page.goto(url);
+    await page.waitForSelector('.level-head');
+    const heads = await page.locator('.level-head .level').allTextContents();
+    assert.deepEqual(heads, ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+    const levels = readJson('texts/index.json').map((w) => w.level);
+    assert.deepEqual(levels, [...levels].sort(), 'index.json is in level order');
+    await page.goto(`${url}#/read/mcguffey-first-reader`);
+    assert.equal(await page.textContent('.para[data-i="0"] .lesson'), 'Lesson LIII');
+    assert.equal(await page.textContent('h1 .level'), 'A1');
+  },
+
+  async 'word panel shows in-context meaning, common meanings and idioms'({ page, url }) {
+    const dict = readJson('texts/dict.json');
+    await page.goto(`${url}#/read/selfish-giant`);
+    await word(page, 3, 'ran').click(); // “… and the children ran away.”
+    assert.equal(await page.textContent('#sheet-meaning'), readJson('texts/selfish-giant.json').paragraphs[3].g.ran);
+    const common = await page.locator('#sheet-common li').allTextContents();
+    assert.deepEqual(common, dict.run.m);
+    const idioms = await page.locator('#sheet-idioms li').count();
+    assert.equal(idioms, dict.run.i.length);
+  },
+
   async 'tap a word to see its meaning, tap again to save it'({ page, url }) {
     await page.goto(`${url}#/read/selfish-giant`);
     await word(page, 0, 'afternoon').click();
@@ -158,7 +194,7 @@ const tests = {
     let exp = expectedStats(work, count2);
     assert.equal(await statText(page, 'stat-total'), exp.total);
     assert.equal(await statText(page, 'stat-unique'), exp.unique);
-    assert.match(await page.textContent('.works'), new RegExp(`${count2} / `));
+    assert.match(await page.textContent('a[href="#/read/selfish-giant"]'), new RegExp(`${count2} / `));
 
     // 前の単語を長押しすると、そこまでに戻る。取り消しで元に戻る
     await page.goto(`${url}#/read/selfish-giant`);
@@ -181,7 +217,7 @@ const tests = {
     assert.match(await page.textContent('#toast'), /読了/);
     await page.goto(url);
     const n = tokens(work).length.toLocaleString('en-US');
-    assert.equal(await page.textContent('.works .status'), `${n} / ${n} 語`);
+    assert.equal(await page.textContent('a[href="#/read/selfish-giant"] .status'), `${n} / ${n} 語`);
     exp = expectedStats(work, Infinity);
     assert.equal(await statText(page, 'stat-total'), exp.total);
     assert.equal(await statText(page, 'stat-unique'), exp.unique);
@@ -218,11 +254,11 @@ const tests = {
     await page.waitForSelector('.stats');
     assert.equal(await statText(page, 'stat-total'), all.total, 'finished work counts fully (no double count)');
     assert.equal(await statText(page, 'stat-unique'), all.unique);
-    assert.match(await page.textContent('.works .status'), /^読了 1 回$/);
+    assert.match(await page.textContent('a[href="#/read/selfish-giant"] .status'), /^読了 1 回$/);
 
     // 取り消すと元の読みかけ（8 語）に戻る
     await page.click('#toast button');
-    await page.waitForFunction(() => /^8 \//.test(document.querySelector('.works .status')?.textContent));
+    await page.waitForFunction(() => /^8 \//.test(document.querySelector('a[href="#/read/selfish-giant"] .status')?.textContent));
     assert.equal(await statText(page, 'stat-total'), 8);
 
     // もう一度読了 → 2 回目を途中まで → 延べ数だけ増え、語彙数は増えない
@@ -234,7 +270,7 @@ const tests = {
     await page.goto(url);
     assert.equal(await statText(page, 'stat-total'), all.total + 19);
     assert.equal(await statText(page, 'stat-unique'), all.unique);
-    assert.match(await page.textContent('.works .status'), /^読了 1 回・2 回目 19 \//);
+    assert.match(await page.textContent('a[href="#/read/selfish-giant"] .status'), /^読了 1 回・2 回目 19 \//);
 
     await page.reload();
     assert.equal(await statText(page, 'stat-total'), all.total + 19);
