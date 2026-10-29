@@ -130,6 +130,7 @@ const tests = {
     await page.goto(`${url}#/read/selfish-giant`);
     await word(page, 3, 'ran').click(); // “… and the children ran away.”
     assert.equal(await page.textContent('#sheet-meaning'), readJson('texts/selfish-giant.json').paragraphs[3].g.ran);
+    assert.doesNotMatch(await page.textContent('#sheet'), /null|undefined/);
     const common = await page.locator('#sheet-common li').allTextContents();
     assert.deepEqual(common, dict.run.m);
     const idioms = await page.locator('#sheet-idioms li').count();
@@ -139,6 +140,7 @@ const tests = {
   async 'tap a word to see its meaning, tap again to save it'({ page, url }) {
     await page.goto(`${url}#/read/selfish-giant`);
     await word(page, 0, 'afternoon').click();
+    assert.equal(await page.textContent('#sheet-word'), 'afternoon');
     assert.equal(await page.textContent('#sheet-meaning'), '午後');
     assert.equal(await page.textContent('#sheet-label'), 'この文での意味');
     assert.doesNotMatch(await page.textContent('#sheet'), /EVERY afternoon/, 'the sentence itself is not shown');

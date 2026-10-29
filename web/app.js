@@ -379,11 +379,12 @@ function onWord(span, para, work, common, lemmas, dict) {
   selected = span;
   span.classList.add('sel');
 
-  document.getElementById('sheet-word').replaceChildren(
-    word, lemma !== wordKey(word) ? h('small', {}, `原形 ${lemma}`) : null);
+  const wordEl = document.getElementById('sheet-word');
+  wordEl.replaceChildren(word);
+  if (lemma !== wordKey(word)) wordEl.append(h('small', {}, `原形 ${lemma}`));
   document.getElementById('sheet-meaning').textContent = meaning ?? '（この単語の訳は未登録です）';
   const entry = dict[lemma] ?? dict[wordKey(word)] ?? {};
-  document.getElementById('sheet-more').replaceChildren(
+  document.getElementById('sheet-more').replaceChildren(...[
     entry.m?.length
       ? h('section', { id: 'sheet-common' }, h('h4', {}, 'よく使われる意味'),
         h('ul', {}, entry.m.map((m) => h('li', {}, m))))
@@ -391,7 +392,8 @@ function onWord(span, para, work, common, lemmas, dict) {
     entry.i?.length
       ? h('section', { id: 'sheet-idioms' }, h('h4', {}, 'イディオム・成句'),
         h('ul', {}, entry.i.map(([en, ja]) => h('li', {}, h('b', { lang: 'en' }, en), ` ${ja}`))))
-      : null);
+      : null,
+  ].filter(Boolean));
   setStatus(isSaved(wordKey(word), sentence) ? '登録済み' : 'もう一度タップで単語帳に登録');
   sheet.hidden = false;
 }
