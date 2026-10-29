@@ -16,9 +16,11 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
 // ---------------------------------------------------------------------------
 
 function load() {
-  const empty = { progress: {}, vocab: [], showJa: true };
+  // read: 作品ごとに「先頭から何語目まで読んだか」
+  const empty = { read: {}, vocab: [], showJa: true };
   try {
-    return { ...empty, ...JSON.parse(localStorage.getItem(STORE_KEY)) };
+    const { progress, ...saved } = JSON.parse(localStorage.getItem(STORE_KEY)) ?? {}; // progress は旧形式
+    return { ...empty, ...saved };
   } catch {
     return empty;
   }
@@ -48,12 +50,24 @@ async function getJson(path) {
 
 const getIndex = () => getJson('texts/index.json');
 const getCommon = () => getJson('texts/common.json');
+const getLemmas = () => getJson('texts/lemmas.json');
 const getWork = (id) => getJson(`texts/${encodeURIComponent(id)}.json`);
 
 /** 単語の見出し形。小文字にし、所有格の 's は外す（Giant's → giant） */
 function wordKey(word) {
   const k = word.toLowerCase().replace(/’/g, "'");
   return k.endsWith("'s") ? k.slice(0, -2) : k;
+}
+
+/** 原形（ran → run、children → child）。lemmas.json に無ければそのまま */
+function lemmaOf(word, lemmas) {
+  const k = wordKey(word);
+  return lemmas[k] ?? k;
+}
+
+/** 作品の全単語（段落をまたいだ通し番号順） */
+function tokensOf(work) {
+  return work.paragraphs.flatMap((p) => p.en.match(TOKEN_RE) ?? []);
 }
 
 function meaningOf(word, para, common) {
@@ -78,21 +92,19 @@ function sentenceAt(text, pos) {
 }
 
 // ---------------------------------------------------------------------------
-// 統計：既読の段落から毎回計算する（記録は「どこまで読んだか」だけ）
+// 統計：記録は「何語目まで読んだか」だけで、単語数はそこから毎回計算する
 // ---------------------------------------------------------------------------
 
 async function computeStats() {
+  const lemmas = await getLemmas();
   let total = 0;
   const types = new Set();
   for (const { id } of await getIndex()) {
-    const read = state.progress[id] ?? 0;
+    const read = state.read[id] ?? 0;
     if (!read) continue;
-    const work = await getWork(id);
-    for (const p of work.paragraphs.slice(0, read)) {
-      for (const w of p.en.match(TOKEN_RE) ?? []) {
-        total++;
-        types.add(wordKey(w));
-      }
+    for (const w of tokensOf(await getWork(id)).slice(0, read)) {
+      total++;
+      types.add(lemmaOf(w, lemmas));
     }
   }
   return { total, unique: types.size };
@@ -139,13 +151,13 @@ async function route() {
 async function homeView() {
   const [works, stats] = await Promise.all([getIndex(), computeStats()]);
   const list = await Promise.all(works.map(async (w) => {
-    const total = (await getWork(w.id)).paragraphs.length;
-    const read = state.progress[w.id] ?? 0;
+    const total = tokensOf(await getWork(w.id)).length;
+    const read = state.read[w.id] ?? 0;
     return h('li', {},
       h('a', { href: `#/read/${encodeURIComponent(w.id)}` },
         h('span', { class: 'title' }, w.title),
         h('span', { class: 'sub' }, `${w.titleJa} ／ ${w.author}`),
-        h('span', { class: 'sub' }, read >= total ? '読了' : read ? `${read} / ${total} 段落` : '未読')));
+        h('span', { class: 'sub' }, read >= total ? '読了' : read ? `${read.toLocaleString()} / ${total.toLocaleString()} 語` : '未読')));
   }));
   return {
     nodes: [
@@ -164,8 +176,7 @@ function stat(label, value, id) {
 }
 
 async function readerView(id) {
-  const [work, common] = await Promise.all([getWork(id), getCommon()]);
-  const read = state.progress[id] ?? 0;
+  const [work, common, lemmas] = await Promise.all([getWork(id), getCommon(), getLemmas()]);
   const jaToggle = h('button', { type: 'button', class: 'toggle' });
   const setJa = () => {
     main.classList.toggle('hide-ja', !state.showJa);
@@ -173,22 +184,27 @@ async function readerView(id) {
   };
   jaToggle.addEventListener('click', () => { state.showJa = !state.showJa; save(); setJa(); });
 
+  let n = 0; // 作品全体での単語の通し番号
   const paras = work.paragraphs.map((p, i) => {
     const en = h('p', { class: 'en', lang: 'en' });
     let last = 0;
     for (const m of p.en.matchAll(TOKEN_RE)) {
-      en.append(p.en.slice(last, m.index), h('span', { class: 'w', 'data-pos': m.index }, m[0]));
+      en.append(p.en.slice(last, m.index), h('span', { class: 'w', 'data-pos': m.index, 'data-n': n++ }, m[0]));
       last = m.index + m[0].length;
     }
     en.append(p.en.slice(last));
     en.addEventListener('click', (e) => {
       const span = e.target.closest('.w');
-      if (span) onWord(span, p, work, common);
+      if (span && !longPressed) onWord(span, p, work, common, lemmas);
     });
-    return h('section', { class: `para${i < read ? ' read' : ''}`, 'data-i': i },
-      en,
-      h('p', { class: 'ja', lang: 'ja' }, p.ja),
-      h('button', { type: 'button', class: 'mark', onclick: () => onMark(id, i) }, ''));
+    return h('section', { class: 'para', 'data-i': i }, en, h('p', { class: 'ja', lang: 'ja' }, p.ja));
+  });
+  const container = h('div', { class: 'paras' }, paras);
+  const words = [...container.querySelectorAll('.w')];
+  enableLongPress(container, (span) => {
+    const before = state.read[id] ?? 0;
+    setRead(id, words, Number(span.dataset.n) + 1);
+    showToast(`ここまで読みました：${state.read[id].toLocaleString()}語`, () => setRead(id, words, before));
   });
 
   return {
@@ -196,35 +212,89 @@ async function readerView(id) {
       h('div', { class: 'reader-head' },
         h('h1', { lang: 'en' }, work.title),
         h('p', { class: 'sub' }, `${work.titleJa} ／ ${work.author}（${work.year}）`),
+        h('p', { class: 'sub' }, '単語をタップで意味、長押しで「ここまで読んだ」'),
         jaToggle),
-      h('div', { class: 'paras' }, paras),
+      container,
       h('p', { class: 'source' }, `出典：${work.source}。和訳と語釈はこのアプリ用に作成したものです。`),
     ],
     after() {
       setJa();
-      updateMarks(id);
-      // 続きから読めるように、まだ読んでいない最初の段落へ移動する
-      if (read > 0 && read < paras.length) paras[read].scrollIntoView({ block: 'start' });
+      const read = state.read[id] ?? 0;
+      updateRead(words, read);
+      // 続きから読めるように、まだ読んでいない最初の単語の段落へ移動する
+      if (read > 0 && read < words.length) words[read].closest('.para').scrollIntoView({ block: 'start' });
     },
   };
 }
 
-/** その段落まで読んだことにする。最後に読んだ段落をもう一度押すと 1 つ戻す */
-function onMark(id, i) {
-  const read = state.progress[id] ?? 0;
-  state.progress[id] = read === i + 1 ? i : i + 1;
+/** 先頭から count 語目までを既読にする（前の単語を長押しすれば戻せる） */
+function setRead(id, words, count) {
+  state.read[id] = count;
   save();
-  updateMarks(id);
+  updateRead(words, count);
 }
 
-function updateMarks(id) {
-  const read = state.progress[id] ?? 0;
-  for (const sec of main.querySelectorAll('.para')) {
-    const i = Number(sec.dataset.i);
-    sec.classList.toggle('read', i < read);
-    sec.querySelector('.mark').textContent =
-      i === read - 1 ? '✓ ここまで読んだ（押すと取り消し）' : i < read ? '✓ 既読' : 'ここまで読んだ';
-  }
+function updateRead(words, count) {
+  words.forEach((w, i) => {
+    w.classList.toggle('read', i < count);
+    w.classList.toggle('last', i === count - 1);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// 長押し（指を約 0.5 秒離さない）。長押しの指を離したときのタップ扱いは無視する
+// ---------------------------------------------------------------------------
+
+const LONG_PRESS_MS = 500;
+let longPressed = false; // 直前の操作が長押しだったか
+
+function enableLongPress(container, onLongPress) {
+  let timer = 0;
+  let startX = 0;
+  let startY = 0;
+  const cancel = () => clearTimeout(timer);
+  container.addEventListener('pointerdown', (e) => {
+    const span = e.target.closest('.w');
+    if (!span || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    longPressed = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    cancel();
+    timer = setTimeout(() => {
+      longPressed = true;
+      navigator.vibrate?.(30);
+      onLongPress(span);
+    }, LONG_PRESS_MS);
+  });
+  container.addEventListener('pointermove', (e) => {
+    if (Math.hypot(e.clientX - startX, e.clientY - startY) > 10) cancel(); // スクロール中は長押しにしない
+  });
+  for (const type of ['pointerup', 'pointercancel', 'pointerleave']) container.addEventListener(type, cancel);
+  container.addEventListener('contextmenu', (e) => {
+    if (e.target.closest('.w')) e.preventDefault(); // 長押しメニューを出さない
+  });
+}
+
+// ---------------------------------------------------------------------------
+// 画面下のお知らせ（取り消しボタン付き）
+// ---------------------------------------------------------------------------
+
+const toast = document.getElementById('toast');
+let toastTimer = 0;
+
+function showToast(text, onUndo) {
+  closeSheet();
+  clearTimeout(toastTimer);
+  toast.replaceChildren(h('span', {}, text), h('button', {
+    type: 'button',
+    onclick: () => { onUndo(); hideToast(); },
+  }, '取り消す'));
+  toast.hidden = false;
+  toastTimer = setTimeout(hideToast, 4000);
+}
+
+function hideToast() {
+  toast.hidden = true;
 }
 
 // ---------------------------------------------------------------------------
@@ -238,20 +308,22 @@ document.addEventListener('click', (e) => {
   if (!sheet.hidden && !e.target.closest('.w, #sheet')) closeSheet();
 });
 
-function onWord(span, para, work, common) {
+function onWord(span, para, work, common, lemmas) {
   const word = span.textContent;
+  const lemma = lemmaOf(word, lemmas);
   const { text: sentence, offset } = sentenceAt(para.en, Number(span.dataset.pos));
   const meaning = meaningOf(word, para, common);
 
   if (selected === span) {
-    addVocab({ w: wordKey(word), m: meaning ?? '', s: sentence, src: work.title });
+    addVocab({ w: wordKey(word), l: lemma, m: meaning ?? '', s: sentence, src: work.title });
     return;
   }
   selected?.classList.remove('sel');
   selected = span;
   span.classList.add('sel');
 
-  document.getElementById('sheet-word').textContent = word;
+  document.getElementById('sheet-word').replaceChildren(
+    word, lemma !== wordKey(word) ? h('small', {}, `原形 ${lemma}`) : null);
   document.getElementById('sheet-meaning').textContent = meaning ?? '（この単語の訳は未登録です）';
   const sentEl = document.getElementById('sheet-sentence');
   sentEl.replaceChildren(
@@ -285,7 +357,10 @@ function closeSheet() {
 function vocabView() {
   const items = [...state.vocab].reverse().map((v) =>
     h('li', {},
-      h('div', { class: 'vw' }, h('b', { lang: 'en' }, v.w), h('span', {}, v.m)),
+      h('div', { class: 'vw' },
+        h('b', { lang: 'en' }, v.w),
+        v.l && v.l !== v.w ? h('small', { lang: 'en' }, `（${v.l}）`) : null,
+        h('span', {}, v.m)),
       h('p', { class: 'vs', lang: 'en' }, v.s),
       h('button', {
         type: 'button', class: 'del', 'aria-label': `${v.w} を削除`,

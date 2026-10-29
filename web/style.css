@@ -89,7 +89,7 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
 
 /* 本文 */
 .reader-head { margin-bottom: 16px; }
-.toggle, .mark, .del {
+.toggle, .del {
   min-height: 40px;
   padding: 6px 12px;
   border: 1px solid var(--line);
@@ -98,9 +98,19 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
   cursor: pointer;
 }
 .para { padding: 4px 0 12px; border-bottom: 1px solid var(--line); scroll-margin-top: 64px; }
-.en { font-size: 1.1rem; line-height: 1.8; margin: 8px 0; }
+.en {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin: 8px 0;
+  /* 長押しで文字選択やメニューが出ないようにする */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
 .w { cursor: pointer; border-radius: 3px; }
 .w.sel { background: var(--sel); }
+.w.read { color: var(--sub); }
+.w.last { color: var(--read); border-bottom: 2px solid var(--read); }
 .ja {
   margin: 0 0 8px;
   padding: 8px 10px;
@@ -110,9 +120,6 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
   font-size: 0.9rem;
 }
 .hide-ja .ja { display: none; }
-.mark { width: 100%; color: var(--sub); }
-.para.read .mark { color: var(--read); border-color: var(--read); }
-.para.read .en { color: var(--sub); }
 .source { margin-top: 24px; color: var(--sub); font-size: 0.8rem; }
 
 /* 単語の意味（画面下のパネル） */
@@ -143,6 +150,7 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
   cursor: pointer;
 }
 #sheet-word { font-size: 1.3rem; font-weight: 700; }
+#sheet-word small, .vw small { margin-left: 8px; color: var(--sub); font-size: 0.8rem; font-weight: 400; }
 #sheet-meaning { margin: 4px 0 8px; }
 #sheet-sentence { margin: 0 0 8px; color: var(--sub); font-size: 0.9rem; }
 #sheet-sentence mark { background: var(--sel); color: inherit; }
@@ -154,3 +162,35 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
 .vw b { margin-right: 8px; font-size: 1.1rem; }
 .vs { margin: 4px 0 0; color: var(--sub); font-size: 0.85rem; }
 .del { position: absolute; top: 12px; right: 0; font-size: 0.8rem; }
+
+/* 長押し後のお知らせ */
+#toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  top: calc(64px + env(safe-area-inset-top)); /* 画面下の本文を隠さないよう上に出す */
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 648px;
+  margin: 0 auto;
+  padding: 10px 12px 10px 16px;
+  border-radius: 12px;
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+}
+#toast[hidden] { display: none; }
+#toast span { flex: 1; }
+#toast button {
+  min-height: 40px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #93c5fd;
+  font-weight: 700;
+  cursor: pointer;
+}

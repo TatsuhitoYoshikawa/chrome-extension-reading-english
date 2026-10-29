@@ -35,9 +35,32 @@ const key = (w) => {
   const k = w.toLowerCase().replace(/’/g, "'");
   return k.endsWith("'s") ? k.slice(0, -2) : k;
 };
-function expectedStats(paragraphs) {
-  const words = paragraphs.flatMap((p) => p.en.match(TOKEN_RE) ?? []);
-  return { total: words.length, unique: new Set(words.map(key)).size };
+const lemma = (w) => readJson('texts/lemmas.json')[key(w)] ?? key(w);
+const tokens = (work) => work.paragraphs.flatMap((p) => p.en.match(TOKEN_RE) ?? []);
+function expectedStats(work, count) {
+  const words = tokens(work).slice(0, count);
+  return { total: words.length, unique: new Set(words.map(lemma)).size };
+}
+
+/** マウスで長押し */
+async function longPress(page, locator) {
+  await locator.scrollIntoViewIfNeeded();
+  const box = await locator.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(700);
+  await page.mouse.up();
+}
+
+/** 指で長押し（Chrome DevTools Protocol でタッチ操作を送る） */
+async function touchLongPress(page, locator) {
+  await locator.scrollIntoViewIfNeeded();
+  const box = await locator.boundingBox();
+  const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+  await page.waitForTimeout(700);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
 }
 
 const readJson = (rel) => JSON.parse(fs.readFileSync(path.join(WEB, rel), 'utf8'));
@@ -90,36 +113,80 @@ const tests = {
     assert.match(items[0], /庭/);
   },
 
-  async 'marking paragraphs as read updates word counts and persists'({ page, url }) {
+  'inflected forms are listed with existing base forms'() {
+    const lemmas = readJson('texts/lemmas.json');
+    for (const [form, base] of Object.entries(lemmas)) {
+      assert.notEqual(form, base);
+      assert.equal(lemmas[base], undefined, `${base} (base of ${form}) must not be inflected again`);
+    }
+  },
+
+  async 'long-press a word to mark reading progress up to it'({ page, url }) {
     const work = readJson('texts/selfish-giant.json');
     await page.goto(url);
     assert.equal(await statText(page, 'stat-total'), 0);
 
     await page.goto(`${url}#/read/selfish-giant`);
-    await page.click('.para[data-i="1"] .mark'); // 2 段落目まで読んだ
+    await longPress(page, word(page, 0, 'school')); // EVERY afternoon, as they were coming from school
+    assert.equal(await page.isVisible('#sheet'), false, 'long-press must not open the meaning panel');
+    assert.match(await page.textContent('#toast'), /ここまで読みました：8語/);
+    assert.equal(await page.locator('.w.read').count(), 8);
+    assert.equal(await page.textContent('.w.last'), 'school');
+
+    // 2 段落目の最後の単語まで
+    await longPress(page, page.locator('.para[data-i="1"] .w').last());
+    const count2 = tokens({ paragraphs: work.paragraphs.slice(0, 2) }).length;
     await page.goto(url);
-    let exp = expectedStats(work.paragraphs.slice(0, 2));
+    let exp = expectedStats(work, count2);
     assert.equal(await statText(page, 'stat-total'), exp.total);
     assert.equal(await statText(page, 'stat-unique'), exp.unique);
-    assert.ok(exp.unique < exp.total);
+    assert.match(await page.textContent('.works'), new RegExp(`${count2} / `));
 
-    // 最後に読んだ段落をもう一度押すと 1 段落戻る
+    // 前の単語を長押しすると、そこまでに戻る。取り消しで元に戻る
     await page.goto(`${url}#/read/selfish-giant`);
-    await page.click('.para[data-i="1"] .mark');
+    await longPress(page, word(page, 0, 'garden'));
+    assert.equal(await page.locator('.w.read').count(), 19);
+    await page.click('#toast button');
+    assert.equal(await page.locator('.w.read').count(), count2);
+    await longPress(page, word(page, 0, 'garden'));
+
     await page.reload();
     await page.goto(url);
-    exp = expectedStats(work.paragraphs.slice(0, 1));
-    assert.equal(await statText(page, 'stat-total'), exp.total);
-    assert.equal(exp.total, 19); // "EVERY afternoon, ... the Giant’s garden."
-    assert.equal(exp.unique, 18); // the が 2 回
+    exp = expectedStats(work, 19);
+    assert.equal(await statText(page, 'stat-total'), 19); // "EVERY afternoon, ... the Giant’s garden."
+    assert.equal(await statText(page, 'stat-unique'), 18); // the が 2 回（were は be として 1 語）
+    assert.deepEqual(exp, { total: 19, unique: 18 });
 
-    // 全部読むと「読了」
+    // 最後の単語まで読むと「読了」。活用形をまとめるので種類数は見出し形より少ない
     await page.goto(`${url}#/read/selfish-giant`);
-    await page.click(`.para[data-i="${work.paragraphs.length - 1}"] .mark`);
+    await longPress(page, page.locator('.w').last());
     await page.goto(url);
     assert.match(await page.textContent('.works'), /読了/);
-    exp = expectedStats(work.paragraphs);
+    exp = expectedStats(work, Infinity);
     assert.equal(await statText(page, 'stat-total'), exp.total);
+    assert.equal(await statText(page, 'stat-unique'), exp.unique);
+    assert.ok(exp.unique < new Set(tokens(work).map(key)).size);
+  },
+
+  async 'touch long-press marks progress without opening the meaning panel'({ page, url }) {
+    await page.goto(`${url}#/read/selfish-giant`);
+    await touchLongPress(page, word(page, 0, 'school'));
+    await page.waitForTimeout(300);
+    assert.equal(await page.isVisible('#sheet'), false);
+    assert.equal(await page.locator('.w.read').count(), 8);
+    // 普通のタップは今までどおり意味を表示する
+    await word(page, 0, 'garden').tap();
+    assert.equal(await page.textContent('#sheet-meaning'), '庭');
+  },
+
+  async 'shows the base form of an inflected word'({ page, url }) {
+    await page.goto(`${url}#/read/selfish-giant`);
+    await word(page, 3, 'ran').click();
+    assert.match(await page.textContent('#sheet-word'), /^ran原形 run$/);
+    await word(page, 3, 'ran').click();
+    await page.goto(`${url}#/vocab`);
+    await page.waitForSelector('.vocab li');
+    assert.match(await page.textContent('.vocab li'), /ran（run）/);
   },
 
   async 'Japanese toggle is remembered'({ page, url }) {

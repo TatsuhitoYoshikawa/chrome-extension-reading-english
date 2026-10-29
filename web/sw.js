@@ -2,10 +2,10 @@
 
 // オフラインでも読めるようにするための Service Worker。
 // 通信できるときは常に最新を取りに行き（network first）、取れなければ保存済みの物を使う。
-const CACHE = 'bilingual-reader-v1';
+const CACHE = 'bilingual-reader-v2';
 const PRECACHE = [
   './', 'index.html', 'app.js', 'style.css', 'manifest.webmanifest', 'icon-192.png',
-  'texts/index.json', 'texts/common.json',
+  'texts/index.json', 'texts/common.json', 'texts/lemmas.json',
 ];
 
 self.addEventListener('install', (e) => {
