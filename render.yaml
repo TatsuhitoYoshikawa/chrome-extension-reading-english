@@ -4,6 +4,7 @@ services:
   - type: web
     runtime: static
     name: bilingual-reader
+    branch: main # main にプッシュしたときだけ公開し直す
     buildCommand: echo "no build step"
     staticPublishPath: ./web
     pullRequestPreviewsEnabled: false

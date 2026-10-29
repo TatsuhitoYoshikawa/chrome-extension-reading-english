@@ -86,7 +86,7 @@
 
 1. [Render](https://dashboard.render.com/) に GitHub アカウントでログインします。
 2. **New → Blueprint** を選び、GitHub の連携でこのリポジトリ（`chrome-extension-reading-english`）へのアクセスを許可して選びます。
-3. ブランチを選びます。今は `ccr-f57764b1-2zdjw7` しかないので、それが選ばれます（`main` などに変えた場合は、そのブランチを選んでください）。
+3. ブランチは **`main`** を選びます（`render.yaml` でも `main` を公開するよう指定しています）。
 4. `render.yaml` の内容（`bilingual-reader` という Static Site）が表示されるので、**Deploy Blueprint**（適用）を押します。
 5. 数十秒で公開され、`https://bilingual-reader-xxxx.onrender.com` のようなアドレスが表示されます。
 
@@ -94,7 +94,7 @@ Render の Blueprint を使わず、**New → Static Site** から手で作る�
 
 ### 更新
 
-選んだブランチに変更がプッシュされると、Render が自動で公開し直します。スマホでは、アプリを開き直すと新しい版が読み込まれます。
+`main` ブランチに変更がプッシュ（またはマージ）されると、Render が自動で公開し直します。作業用のブランチにプッシュしただけでは公開されません。スマホでは、アプリを開き直すと新しい版が読み込まれます。
 
 ### 注意
 
