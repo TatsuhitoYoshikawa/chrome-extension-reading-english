@@ -124,6 +124,8 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
 
 /* 単語の意味（画面下のパネル） */
 #sheet {
+  max-height: 60vh;
+  overflow-y: auto;
   position: fixed;
   left: 0;
   right: 0;
@@ -151,9 +153,12 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
 }
 #sheet-word { font-size: 1.3rem; font-weight: 700; }
 #sheet-word small, .vw small { margin-left: 8px; color: var(--sub); font-size: 0.8rem; font-weight: 400; }
-#sheet-meaning { margin: 4px 0 8px; }
-#sheet-sentence { margin: 0 0 8px; color: var(--sub); font-size: 0.9rem; }
-#sheet-sentence mark { background: var(--sel); color: inherit; }
+
+#sheet-label, #sheet-more h4 { margin: 8px 0 2px; color: var(--sub); font-size: 0.75rem; font-weight: 600; }
+#sheet-meaning { font-size: 1.05rem; }
+#sheet-more ul { margin: 0 0 4px; padding-left: 1.2em; font-size: 0.9rem; }
+#sheet-more li { margin: 2px 0; }
+#sheet-more b { font-weight: 600; }
 #sheet-status { color: var(--accent); font-size: 0.85rem; }
 
 /* 単語帳 */
@@ -212,3 +217,19 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
 .backup { margin-top: 32px; }
 .backup .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .backup button { min-height: 44px; }
+
+/* CEFR レベル */
+.level {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.8em;
+  font-weight: 700;
+  vertical-align: 0.15em;
+}
+.level-A { background: #16a34a; }
+.level-B { background: #2563eb; }
+.level-C { background: #9333ea; }
+.level-head { margin: 20px 0 0; font-size: 1rem; }
+.lesson { margin: 24px 0 0; font-size: 1rem; color: var(--sub); }

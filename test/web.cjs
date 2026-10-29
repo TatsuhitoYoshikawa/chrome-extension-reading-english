@@ -104,8 +104,8 @@ const tests = {
     await page.goto(`${url}#/read/selfish-giant`);
     await word(page, 0, 'afternoon').click();
     assert.equal(await page.textContent('#sheet-meaning'), '午後');
-    assert.match(await page.textContent('#sheet-sentence'), /^EVERY afternoon, as they were coming/);
-    assert.equal(await page.textContent('#sheet-sentence mark'), 'afternoon');
+    assert.equal(await page.textContent('#sheet-label'), 'この文での意味');
+    assert.doesNotMatch(await page.textContent('#sheet'), /EVERY afternoon/, 'the sentence itself is not shown');
     assert.match(await page.textContent('#sheet-status'), /もう一度タップ/);
 
     // 別の単語は意味が切り替わるだけ（登録されない）
@@ -115,18 +115,20 @@ const tests = {
     assert.match(await page.textContent('#sheet-status'), /登録しました/);
     await word(page, 0, 'garden').click(); // 3 回目でも重複登録しない
 
-    // 文の中の正しい位置が強調される（1 段落に複数文ある場合）
+    // 単語帳には、あとで見返せるよう単語を含む 1 文も保存する（1 段落に複数文ある場合はその文だけ）
     await word(page, 1, 'listen').click();
-    assert.match(await page.textContent('#sheet-sentence'), /^The birds sat on the trees/);
-    assert.equal(await page.textContent('#sheet-sentence mark'), 'listen');
+    await word(page, 1, 'listen').click();
 
     await page.reload();
     await page.goto(`${url}#/vocab`);
     await page.waitForSelector('.vocab li');
     const items = await page.locator('.vocab li').allTextContents();
-    assert.equal(items.length, 1);
-    assert.match(items[0], /garden/);
-    assert.match(items[0], /庭/);
+    assert.equal(items.length, 2);
+    assert.match(items[0], /listen/);
+    assert.match(items[0], /^.*The birds sat on the trees and sang so sweetly that the children used to stop their games in order to listen to them\./);
+    assert.doesNotMatch(items[0], /It was a large lovely garden/);
+    assert.match(items[1], /garden/);
+    assert.match(items[1], /庭/);
   },
 
   'inflected forms are listed with existing base forms'() {

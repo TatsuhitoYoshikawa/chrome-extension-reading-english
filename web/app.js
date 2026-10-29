@@ -52,6 +52,7 @@ async function getJson(path) {
 const getIndex = () => getJson('texts/index.json');
 const getCommon = () => getJson('texts/common.json');
 const getLemmas = () => getJson('texts/lemmas.json');
+const getDict = () => getJson('texts/dict.json'); // 原形ごとの「よく使われる意味」と「イディオム」
 const getWork = (id) => getJson(`texts/${encodeURIComponent(id)}.json`);
 
 /** 単語の見出し形。小文字にし、所有格の 's は外す（Giant's → giant） */
@@ -157,9 +158,18 @@ async function route() {
   view.after?.();
 }
 
+/** CEFR のレベルと日本語での目安 */
+const LEVELS = {
+  A1: '入門', A2: '初級', B1: '中級', B2: '中上級', C1: '上級', C2: '最上級',
+};
+
+function levelBadge(level) {
+  return level ? h('span', { class: `level level-${level[0]}` }, level) : null;
+}
+
 async function homeView() {
   const [works, stats] = await Promise.all([getIndex(), computeStats()]);
-  const list = await Promise.all(works.map(async (w) => {
+  const items = await Promise.all(works.map(async (w) => {
     const total = tokensOf(await getWork(w.id)).length;
     const read = state.read[w.id] ?? 0;
     const done = finishedCount(w.id);
@@ -167,12 +177,21 @@ async function homeView() {
       done ? `読了 ${done} 回` : '',
       read ? `${done ? `${done + 1} 回目 ` : ''}${read.toLocaleString()} / ${total.toLocaleString()} 語` : '',
     ].filter(Boolean).join('・') || '未読';
-    return h('li', {},
+    return h('li', { 'data-level': w.level ?? '' },
       h('a', { href: `#/read/${encodeURIComponent(w.id)}` },
         h('span', { class: 'title' }, w.title),
         h('span', { class: 'sub' }, `${w.titleJa} ／ ${w.author}`),
         h('span', { class: 'sub status' }, status)));
   }));
+  // レベル順（A1 → C2）に見出しを付けて並べる
+  const shelf = Object.entries(LEVELS).flatMap(([level, name]) => {
+    const group = items.filter((li) => li.dataset.level === level);
+    return group.length
+      ? [h('h3', { class: 'level-head' }, levelBadge(level), ` ${name}`), h('ul', { class: 'works' }, group)]
+      : [];
+  });
+  const others = items.filter((li) => !(li.dataset.level in LEVELS));
+  if (others.length) shelf.push(h('ul', { class: 'works' }, others));
   return {
     nodes: [
       h('section', { class: 'stats' },
@@ -180,7 +199,8 @@ async function homeView() {
         stat('総語彙数', stats.unique, 'stat-unique'),
         stat('単語帳', state.vocab.length, 'stat-vocab')),
       h('h2', {}, '本棚'),
-      h('ul', { class: 'works' }, list),
+      h('p', { class: 'sub' }, 'レベルは CEFR（ヨーロッパ言語共通参照枠）での目安です。'),
+      ...shelf,
       backupSection(),
     ],
   };
@@ -191,7 +211,7 @@ function stat(label, value, id) {
 }
 
 async function readerView(id) {
-  const [work, common, lemmas] = await Promise.all([getWork(id), getCommon(), getLemmas()]);
+  const [work, common, lemmas, dict] = await Promise.all([getWork(id), getCommon(), getLemmas(), getDict()]);
   const jaToggle = h('button', { type: 'button', class: 'toggle' });
   const setJa = () => {
     main.classList.toggle('hide-ja', !state.showJa);
@@ -210,9 +230,12 @@ async function readerView(id) {
     en.append(p.en.slice(last));
     en.addEventListener('click', (e) => {
       const span = e.target.closest('.w');
-      if (span && !longPressed) onWord(span, p, work, common, lemmas);
+      if (span && !longPressed) onWord(span, p, work, common, lemmas, dict);
     });
-    return h('section', { class: 'para', 'data-i': i }, en, h('p', { class: 'ja', lang: 'ja' }, p.ja));
+    return h('section', { class: 'para', 'data-i': i },
+      p.head ? h('h2', { class: 'lesson', lang: 'en' }, p.head) : null,
+      en,
+      h('p', { class: 'ja', lang: 'ja' }, p.ja));
   });
   const container = h('div', { class: 'paras' }, paras);
   const words = [...container.querySelectorAll('.w')];
@@ -228,7 +251,7 @@ async function readerView(id) {
   return {
     nodes: [
       h('div', { class: 'reader-head' },
-        h('h1', { lang: 'en' }, work.title),
+        h('h1', { lang: 'en' }, levelBadge(work.level), ' ', work.title),
         h('p', { class: 'sub' }, `${work.titleJa} ／ ${work.author}（${work.year}）`),
         h('p', { class: 'sub' }, '単語をタップで意味、長押しで「ここまで読んだ」'),
         jaToggle),
@@ -342,10 +365,10 @@ document.addEventListener('click', (e) => {
   if (!sheet.hidden && !e.target.closest('.w, #sheet')) closeSheet();
 });
 
-function onWord(span, para, work, common, lemmas) {
+function onWord(span, para, work, common, lemmas, dict) {
   const word = span.textContent;
   const lemma = lemmaOf(word, lemmas);
-  const { text: sentence, offset } = sentenceAt(para.en, Number(span.dataset.pos));
+  const { text: sentence } = sentenceAt(para.en, Number(span.dataset.pos)); // 単語帳に一緒に保存する
   const meaning = meaningOf(word, para, common);
 
   if (selected === span) {
@@ -359,9 +382,16 @@ function onWord(span, para, work, common, lemmas) {
   document.getElementById('sheet-word').replaceChildren(
     word, lemma !== wordKey(word) ? h('small', {}, `原形 ${lemma}`) : null);
   document.getElementById('sheet-meaning').textContent = meaning ?? '（この単語の訳は未登録です）';
-  const sentEl = document.getElementById('sheet-sentence');
-  sentEl.replaceChildren(
-    sentence.slice(0, offset), h('mark', {}, word), sentence.slice(offset + word.length));
+  const entry = dict[lemma] ?? dict[wordKey(word)] ?? {};
+  document.getElementById('sheet-more').replaceChildren(
+    entry.m?.length
+      ? h('section', { id: 'sheet-common' }, h('h4', {}, 'よく使われる意味'),
+        h('ul', {}, entry.m.map((m) => h('li', {}, m))))
+      : null,
+    entry.i?.length
+      ? h('section', { id: 'sheet-idioms' }, h('h4', {}, 'イディオム・成句'),
+        h('ul', {}, entry.i.map(([en, ja]) => h('li', {}, h('b', { lang: 'en' }, en), ` ${ja}`))))
+      : null);
   setStatus(isSaved(wordKey(word), sentence) ? '登録済み' : 'もう一度タップで単語帳に登録');
   sheet.hidden = false;
 }
