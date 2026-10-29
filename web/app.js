@@ -16,8 +16,9 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
 // ---------------------------------------------------------------------------
 
 function load() {
-  // read: 作品ごとに「先頭から何語目まで読んだか」
-  const empty = { read: {}, vocab: [], showJa: true };
+  // read: 作品ごとに「今の読み返しで先頭から何語目まで読んだか」
+  // finished: 「読了」ボタンを押した記録（同じ作品を何度読んでも 1 回ずつ数える）
+  const empty = { read: {}, finished: [], vocab: [], showJa: true };
   try {
     const { progress, ...saved } = JSON.parse(localStorage.getItem(STORE_KEY)) ?? {}; // progress は旧形式
     return { ...empty, ...saved };
@@ -92,23 +93,30 @@ function sentenceAt(text, pos) {
 }
 
 // ---------------------------------------------------------------------------
-// 統計：記録は「何語目まで読んだか」だけで、単語数はそこから毎回計算する
+// 統計：全作品を合算する。記録は「読了の履歴」と「今どこまで読んだか」だけで、
+// 単語数はそこから毎回計算する
+//   総単語数 … 読了した作品の全単語（読み返した回数ぶん）＋ 読みかけの作品の既読部分
+//   総語彙数 … それらに出てきた単語の原形の種類（何度出てきても 1 回）
 // ---------------------------------------------------------------------------
 
 async function computeStats() {
   const lemmas = await getLemmas();
+  const known = new Set((await getIndex()).map((w) => w.id));
   let total = 0;
   const types = new Set();
-  for (const { id } of await getIndex()) {
-    const read = state.read[id] ?? 0;
-    if (!read) continue;
-    for (const w of tokensOf(await getWork(id)).slice(0, read)) {
+  const count = async (id, upTo) => {
+    if (!known.has(id) || !upTo) return; // 収録から外れた作品は数えない
+    for (const w of tokensOf(await getWork(id)).slice(0, upTo)) {
       total++;
       types.add(lemmaOf(w, lemmas));
     }
-  }
+  };
+  for (const f of state.finished) await count(f.id, Infinity);
+  for (const [id, read] of Object.entries(state.read)) await count(id, read);
   return { total, unique: types.size };
 }
+
+const finishedCount = (id) => state.finished.filter((f) => f.id === id).length;
 
 // ---------------------------------------------------------------------------
 // 画面
@@ -145,6 +153,7 @@ async function route() {
   if (seq !== routeSeq) return;
   main.className = '';
   main.replaceChildren(...view.nodes);
+  window.scrollTo(0, 0);
   view.after?.();
 }
 
@@ -153,20 +162,26 @@ async function homeView() {
   const list = await Promise.all(works.map(async (w) => {
     const total = tokensOf(await getWork(w.id)).length;
     const read = state.read[w.id] ?? 0;
+    const done = finishedCount(w.id);
+    const status = [
+      done ? `読了 ${done} 回` : '',
+      read ? `${done ? `${done + 1} 回目 ` : ''}${read.toLocaleString()} / ${total.toLocaleString()} 語` : '',
+    ].filter(Boolean).join('・') || '未読';
     return h('li', {},
       h('a', { href: `#/read/${encodeURIComponent(w.id)}` },
         h('span', { class: 'title' }, w.title),
         h('span', { class: 'sub' }, `${w.titleJa} ／ ${w.author}`),
-        h('span', { class: 'sub' }, read >= total ? '読了' : read ? `${read.toLocaleString()} / ${total.toLocaleString()} 語` : '未読')));
+        h('span', { class: 'sub status' }, status)));
   }));
   return {
     nodes: [
       h('section', { class: 'stats' },
-        stat('読んだ単語数', stats.total, 'stat-total'),
-        stat('単語の種類', stats.unique, 'stat-unique'),
+        stat('総単語数', stats.total, 'stat-total'),
+        stat('総語彙数', stats.unique, 'stat-unique'),
         stat('単語帳', state.vocab.length, 'stat-vocab')),
       h('h2', {}, '本棚'),
       h('ul', { class: 'works' }, list),
+      backupSection(),
     ],
   };
 }
@@ -204,7 +219,10 @@ async function readerView(id) {
   enableLongPress(container, (span) => {
     const before = state.read[id] ?? 0;
     setRead(id, words, Number(span.dataset.n) + 1);
-    showToast(`ここまで読みました：${state.read[id].toLocaleString()}語`, () => setRead(id, words, before));
+    const text = state.read[id] === words.length
+      ? '最後まで読みました。いちばん下の「読了」を押すと記録されます'
+      : `ここまで読みました：${state.read[id].toLocaleString()}語`;
+    showToast(text, () => setRead(id, words, before));
   });
 
   return {
@@ -215,6 +233,7 @@ async function readerView(id) {
         h('p', { class: 'sub' }, '単語をタップで意味、長押しで「ここまで読んだ」'),
         jaToggle),
       container,
+      h('button', { type: 'button', class: 'finish', onclick: () => finishWork(id, work) }, '読了（最後まで読んだ）'),
       h('p', { class: 'source' }, `出典：${work.source}。和訳と語釈はこのアプリ用に作成したものです。`),
     ],
     after() {
@@ -232,6 +251,21 @@ function setRead(id, words, count) {
   state.read[id] = count;
   save();
   updateRead(words, count);
+}
+
+/** 読了を記録して本棚へ戻る。次に開くと最初から読み返せる */
+function finishWork(id, work) {
+  const before = state.read[id] ?? 0;
+  state.finished.push({ id, t: Date.now() });
+  delete state.read[id];
+  save();
+  location.hash = '#/';
+  showToast(`「${work.title}」の読了を記録しました（${tokensOf(work).length.toLocaleString()}語）`, () => {
+    state.finished.pop();
+    if (before) state.read[id] = before;
+    save();
+    route();
+  });
 }
 
 function updateRead(words, count) {
@@ -378,6 +412,118 @@ function vocabView() {
         ? h('ul', { class: 'vocab' }, items)
         : h('p', { class: 'sub' }, '本文の単語をタップして意味を表示し、もう一度タップすると登録できます。'),
     ],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// バックアップ（書き出し：ファイルに保存／共有して送る、読み込み：ファイルから復元）
+// ---------------------------------------------------------------------------
+
+const BACKUP_APP = 'bilingual-reader';
+
+function backupSection() {
+  const input = h('input', { type: 'file', accept: '.json,.txt,application/json,text/plain', hidden: '' });
+  input.addEventListener('change', () => {
+    if (input.files[0]) importBackup(input.files[0]);
+    input.value = '';
+  });
+  return h('section', { class: 'backup' },
+    h('h2', {}, 'バックアップ'),
+    h('p', { class: 'sub' }, '読書記録と単語帳をファイルに書き出して、機種変更や消えてしまったときに戻せます。'),
+    h('div', { class: 'buttons' },
+      h('button', { type: 'button', id: 'backup-download', onclick: () => downloadFile(backupFile('json')) },
+        'ファイルに保存'),
+      shareableBackup()
+        ? h('button', { type: 'button', id: 'backup-share', onclick: () => shareFile(shareableBackup()) },
+          '共有して送る')
+        : null,
+      h('button', { type: 'button', id: 'backup-import', onclick: () => input.click() }, '読み込み')),
+    input);
+}
+
+function backupFile(ext) {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const body = JSON.stringify({ app: BACKUP_APP, version: 1, exportedAt: now.toISOString(), data: state }, null, 1);
+  const type = ext === 'json' ? 'application/json' : 'text/plain';
+  return new File([body], `bilingual-reader-backup-${local}.${ext}`, { type });
+}
+
+/** 共有できる形のバックアップ。端末によっては .json を共有できないので .txt も試す */
+function shareableBackup() {
+  if (!navigator.canShare) return null;
+  return ['json', 'txt'].map(backupFile).find((f) => navigator.canShare({ files: [f] })) ?? null;
+}
+
+/** 端末の「ダウンロード」フォルダに保存する */
+function downloadFile(file) {
+  const url = URL.createObjectURL(file);
+  const a = h('a', { href: url, download: file.name, hidden: '' });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+/** Android の共有画面を開く（Google ドライブ、Gmail など） */
+async function shareFile(file) {
+  try {
+    await navigator.share({ files: [file], title: 'Bilingual Reader のバックアップ' });
+  } catch (err) {
+    if (err.name !== 'AbortError') alert(`共有できませんでした（${err.message}）`);
+  }
+}
+
+async function importBackup(file) {
+  let data;
+  try {
+    if (file.size > 5_000_000) throw new Error('ファイルが大きすぎます');
+    data = parseBackup(await file.text());
+  } catch (err) {
+    alert(`読み込めませんでした：${err.message}`);
+    return;
+  }
+  const ok = confirm(`今の記録を、バックアップの内容（単語帳 ${data.vocab.length} 語・読了 ${data.finished.length} 回）で置き換えます。よろしいですか？`);
+  if (!ok) return;
+  Object.assign(state, data);
+  save();
+  route();
+}
+
+/** バックアップの中身を検査し、必要な項目だけを取り出す（壊れた・別物のファイル対策） */
+function parseBackup(text) {
+  let obj;
+  try {
+    obj = JSON.parse(text);
+  } catch {
+    throw new Error('ファイルの形式が正しくありません');
+  }
+  if (obj?.app !== BACKUP_APP || typeof obj.data !== 'object' || obj.data === null) {
+    throw new Error('このアプリのバックアップファイルではありません');
+  }
+  const d = obj.data;
+  const str = (v, max) => typeof v === 'string' && v.length <= max;
+  const list = (v) => (Array.isArray(v) ? v : []);
+  const read = {};
+  for (const [id, n] of Object.entries(typeof d.read === 'object' && d.read ? d.read : {})) {
+    if (str(id, 200) && id !== '__proto__' && Number.isInteger(n) && n > 0) read[id] = n;
+  }
+  return {
+    read,
+    finished: list(d.finished)
+      .filter((f) => str(f?.id, 200) && Number.isFinite(f.t))
+      .map((f) => ({ id: f.id, t: f.t })),
+    vocab: list(d.vocab)
+      .filter((v) => str(v?.w, 100) && str(v.m, 1000) && str(v.s, 5000))
+      .map((v) => ({
+        w: v.w,
+        l: str(v.l, 100) ? v.l : v.w,
+        m: v.m,
+        s: v.s,
+        src: str(v.src, 200) ? v.src : '',
+        t: Number.isFinite(v.t) ? v.t : 0,
+      })),
+    showJa: d.showJa !== false,
   };
 }
 

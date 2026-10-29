@@ -44,7 +44,7 @@ function expectedStats(work, count) {
 
 /** マウスで長押し */
 async function longPress(page, locator) {
-  await locator.scrollIntoViewIfNeeded();
+  await locator.evaluate((el) => el.scrollIntoView({ block: 'center' }));
   const box = await locator.boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
@@ -54,7 +54,7 @@ async function longPress(page, locator) {
 
 /** 指で長押し（Chrome DevTools Protocol でタッチ操作を送る） */
 async function touchLongPress(page, locator) {
-  await locator.scrollIntoViewIfNeeded();
+  await locator.evaluate((el) => el.scrollIntoView({ block: 'center' }));
   const box = await locator.boundingBox();
   const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   const cdp = await page.context().newCDPSession(page);
@@ -157,11 +157,13 @@ const tests = {
     assert.equal(await statText(page, 'stat-unique'), 18); // the が 2 回（were は be として 1 語）
     assert.deepEqual(exp, { total: 19, unique: 18 });
 
-    // 最後の単語まで読むと「読了」。活用形をまとめるので種類数は見出し形より少ない
+    // 最後の単語まで読むと「読了」ボタンを案内する。活用形をまとめるので種類数は見出し形より少ない
     await page.goto(`${url}#/read/selfish-giant`);
     await longPress(page, page.locator('.w').last());
+    assert.match(await page.textContent('#toast'), /読了/);
     await page.goto(url);
-    assert.match(await page.textContent('.works'), /読了/);
+    const n = tokens(work).length.toLocaleString('en-US');
+    assert.equal(await page.textContent('.works .status'), `${n} / ${n} 語`);
     exp = expectedStats(work, Infinity);
     assert.equal(await statText(page, 'stat-total'), exp.total);
     assert.equal(await statText(page, 'stat-unique'), exp.unique);
@@ -187,6 +189,112 @@ const tests = {
     await page.goto(`${url}#/vocab`);
     await page.waitForSelector('.vocab li');
     assert.match(await page.textContent('.vocab li'), /ran（run）/);
+  },
+
+  async 'finishing a work adds all its words, and re-reading adds them again'({ page, url }) {
+    const work = readJson('texts/selfish-giant.json');
+    const all = expectedStats(work, Infinity);
+    await page.goto(`${url}#/read/selfish-giant`);
+    await longPress(page, word(page, 0, 'school')); // 読みかけ（8 語）
+    await page.click('.finish');
+    await page.waitForSelector('.stats');
+    assert.equal(await statText(page, 'stat-total'), all.total, 'finished work counts fully (no double count)');
+    assert.equal(await statText(page, 'stat-unique'), all.unique);
+    assert.match(await page.textContent('.works .status'), /^読了 1 回$/);
+
+    // 取り消すと元の読みかけ（8 語）に戻る
+    await page.click('#toast button');
+    await page.waitForFunction(() => /^8 \//.test(document.querySelector('.works .status')?.textContent));
+    assert.equal(await statText(page, 'stat-total'), 8);
+
+    // もう一度読了 → 2 回目を途中まで → 延べ数だけ増え、語彙数は増えない
+    await page.goto(`${url}#/read/selfish-giant`);
+    await page.click('.finish');
+    await page.goto(`${url}#/read/selfish-giant`);
+    assert.equal(await page.locator('.w.read').count(), 0, 're-reading starts from the beginning');
+    await longPress(page, word(page, 0, 'garden')); // 19 語
+    await page.goto(url);
+    assert.equal(await statText(page, 'stat-total'), all.total + 19);
+    assert.equal(await statText(page, 'stat-unique'), all.unique);
+    assert.match(await page.textContent('.works .status'), /^読了 1 回・2 回目 19 \//);
+
+    await page.reload();
+    assert.equal(await statText(page, 'stat-total'), all.total + 19);
+  },
+
+  async 'totals are summed across works'({ page, url }) {
+    // テスト用に 2 作品目を差し込む
+    const mini = {
+      id: 'mini', title: 'Mini', titleJa: 'ミニ', author: 'Test', year: 2000, source: 'test',
+      paragraphs: [{ en: 'The giant went home. A new word!', ja: 'テスト', g: { home: '家', new: '新しい', word: '単語' } }],
+    };
+    const index = [...readJson('texts/index.json'), { id: 'mini', title: 'Mini', titleJa: 'ミニ', author: 'Test' }];
+    await page.route('**/texts/index.json', (r) => r.fulfill({ json: index }));
+    await page.route('**/texts/mini.json', (r) => r.fulfill({ json: mini }));
+
+    await page.goto(`${url}#/read/selfish-giant`);
+    await longPress(page, word(page, 0, 'garden')); // 19 語・18 種類
+    await page.goto(`${url}#/read/mini`);
+    await page.waitForSelector('.finish');
+    await page.click('.finish'); // the giant went home a new word：7 語、新しい原形は home a new word の 4 つ
+    await page.waitForSelector('.stats');
+    assert.equal(await statText(page, 'stat-total'), 19 + 7);
+    assert.equal(await statText(page, 'stat-unique'), 18 + 4); // the, giant, go(went) は 1 作品目で既出
+  },
+
+  async 'backup: save to a file and restore from it'({ page, url }) {
+    await page.goto(`${url}#/read/selfish-giant`);
+    await longPress(page, word(page, 0, 'school'));
+    await word(page, 0, 'garden').click();
+    await word(page, 0, 'garden').click(); // 単語帳に 1 語
+    await page.goto(url);
+    await page.waitForSelector('#backup-download');
+
+    const [download] = await Promise.all([page.waitForEvent('download'), page.click('#backup-download')]);
+    assert.match(download.suggestedFilename(), /^bilingual-reader-backup-\d{4}-\d{2}-\d{2}\.json$/);
+    const file = await download.path();
+    const backup = JSON.parse(fs.readFileSync(file, 'utf8'));
+    assert.equal(backup.app, 'bilingual-reader');
+    assert.equal(backup.data.read['selfish-giant'], 8);
+    assert.equal(backup.data.vocab[0].w, 'garden');
+
+    // 記録を消してから読み込む
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    assert.equal(await statText(page, 'stat-total'), 0);
+    const dialogs = [];
+    page.on('dialog', (d) => { dialogs.push(d.message()); d.accept(); });
+    await page.setInputFiles('.backup input[type=file]', file);
+    await page.waitForFunction(() => document.getElementById('stat-total')?.textContent === '8');
+    assert.equal(await statText(page, 'stat-vocab'), 1);
+    assert.match(dialogs[0], /置き換えます/);
+
+    // 別のファイルは読み込まない
+    await page.setInputFiles('.backup input[type=file]', {
+      name: 'other.json', mimeType: 'application/json', buffer: Buffer.from('{"hello":1}'),
+    });
+    await page.waitForTimeout(300);
+    assert.match(dialogs.at(-1), /このアプリのバックアップファイルではありません/);
+    assert.equal(await statText(page, 'stat-total'), 8);
+  },
+
+  async 'backup: share opens the system share sheet with the backup file'({ page, url }) {
+    await page.addInitScript(() => {
+      navigator.canShare = (d) => d.files?.[0]?.name.endsWith('.json');
+      navigator.share = async (d) => { window.__shared = { name: d.files[0].name, text: await d.files[0].text() }; };
+    });
+    await page.goto(url);
+    await page.click('#backup-share');
+    await page.waitForFunction(() => window.__shared);
+    const shared = await page.evaluate(() => window.__shared);
+    assert.match(shared.name, /\.json$/);
+    assert.equal(JSON.parse(shared.text).app, 'bilingual-reader');
+  },
+
+  async 'share button is hidden when the browser cannot share files'({ page, url }) {
+    await page.goto(url);
+    await page.waitForSelector('#backup-download');
+    assert.equal(await page.locator('#backup-share').count(), (await page.evaluate(() => !!navigator.canShare)) ? 1 : 0);
   },
 
   async 'Japanese toggle is remembered'({ page, url }) {
@@ -216,7 +324,12 @@ const tests = {
   const browser = await chromium.launch();
   let failed = 0;
   for (const [name, fn] of Object.entries(tests)) {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      hasTouch: true,
+      // Service Worker 経由の通信は page.route で差し替えられないので、オフラインのテスト以外では止める
+      serviceWorkers: name.includes('offline') ? 'allow' : 'block',
+    });
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));

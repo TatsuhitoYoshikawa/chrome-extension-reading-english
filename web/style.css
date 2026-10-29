@@ -89,7 +89,7 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
 
 /* 本文 */
 .reader-head { margin-bottom: 16px; }
-.toggle, .del {
+.toggle, .del, .finish, .backup button {
   min-height: 40px;
   padding: 6px 12px;
   border: 1px solid var(--line);
@@ -168,8 +168,9 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
   position: fixed;
   left: 16px;
   right: 16px;
-  top: calc(64px + env(safe-area-inset-top)); /* 画面下の本文を隠さないよう上に出す */
+  bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 3;
+  pointer-events: none; /* 下の単語の長押し・タップを邪魔しない（ボタンだけ押せる） */
   display: flex;
   align-items: center;
   gap: 12px;
@@ -185,6 +186,7 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
 #toast[hidden] { display: none; }
 #toast span { flex: 1; }
 #toast button {
+  pointer-events: auto;
   min-height: 40px;
   padding: 6px 12px;
   border: 0;
@@ -194,3 +196,19 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
   font-weight: 700;
   cursor: pointer;
 }
+
+/* 読了ボタン */
+.finish {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 24px;
+  border-color: var(--read);
+  color: var(--read);
+  font-weight: 700;
+}
+
+/* バックアップ */
+.backup { margin-top: 32px; }
+.backup .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.backup button { min-height: 44px; }
