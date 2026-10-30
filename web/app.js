@@ -155,8 +155,44 @@ async function route() {
   main.className = '';
   main.replaceChildren(...view.nodes);
   window.scrollTo(0, 0);
+  trackPosition(view.story ?? null);
   view.after?.();
 }
+
+// ---------------------------------------------------------------------------
+// 表示位置（%）：本文の先頭が見えている状態で 0%、本文の最後が画面に入ったら 100%
+// ---------------------------------------------------------------------------
+
+const posText = document.getElementById('pos');
+const posBar = document.getElementById('pos-bar');
+let story = null;
+let posFrame = 0;
+const storyResize = new ResizeObserver(() => updatePosition()); // 和訳の表示切り替えなどで高さが変わったとき
+
+function trackPosition(el) {
+  if (story) storyResize.unobserve(story);
+  story = el;
+  posText.hidden = posBar.hidden = !story;
+  if (story) storyResize.observe(story);
+  updatePosition();
+}
+
+function updatePosition() {
+  if (!story) return;
+  // 本文の最後が画面の下端に来るまでのスクロール量を 100% とする
+  const end = story.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+  // 端数のピクセル（拡大表示など）で 99% に止まらないよう、残り 1px 以内は最後とみなす
+  const ratio = window.scrollY >= end - 1 ? 1 : Math.max(0, window.scrollY / end);
+  const percent = Math.floor(ratio * 100);
+  posText.textContent = `${percent}%`;
+  posBar.firstElementChild.style.width = `${percent}%`;
+}
+
+window.addEventListener('scroll', () => {
+  cancelAnimationFrame(posFrame);
+  posFrame = requestAnimationFrame(updatePosition);
+}, { passive: true });
+window.addEventListener('resize', updatePosition);
 
 /** CEFR のレベルと日本語での目安 */
 const LEVELS = {
@@ -249,6 +285,7 @@ async function readerView(id) {
   });
 
   return {
+    story: container,
     nodes: [
       h('div', { class: 'reader-head' },
         h('h1', { lang: 'en' }, levelBadge(work.level), ' ', work.title),
