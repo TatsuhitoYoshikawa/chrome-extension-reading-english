@@ -64,7 +64,7 @@ button { font: inherit; color: inherit; }
 main {
   max-width: 680px;
   margin: 0 auto;
-  padding: 16px 16px calc(45vh + env(safe-area-inset-bottom));
+  padding: 16px 16px calc(65vh + env(safe-area-inset-bottom));
 }
 
 h1 { font-size: 1.6rem; margin: 0.2em 0; }
@@ -158,6 +158,10 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
   cursor: pointer;
 }
 #sheet-word { font-size: 1.3rem; font-weight: 700; }
+#sheet-pron { margin-top: 2px; font-size: 0.95rem; }
+#sheet-pron .ipa { color: var(--sub); font-family: "Lucida Sans Unicode", "Arial Unicode MS", "Noto Sans", sans-serif; }
+#sheet-pron .kana { margin-left: 4px; }
+#sheet-pron b { color: var(--accent); font-weight: 800; }
 #sheet-word small, .vw small { margin-left: 8px; color: var(--sub); font-size: 0.8rem; font-weight: 400; }
 
 #sheet-label, #sheet-more h4 { margin: 8px 0 2px; color: var(--sub); font-size: 0.75rem; font-weight: 600; }
@@ -239,3 +243,24 @@ h2 { font-size: 1.1rem; margin: 1.5em 0 0.5em; }
 .level-C { background: #9333ea; }
 .level-head { margin: 20px 0 0; font-size: 1rem; }
 .lesson { margin: 24px 0 0; font-size: 1rem; color: var(--sub); }
+
+/* 検索エンジン向けの説明・作品の全文ページ */
+.about { margin-top: 32px; }
+.about summary { cursor: pointer; font-weight: 600; }
+.intro h1 { font-size: 1.3rem; }
+.intro h2 { font-size: 1rem; }
+.faq dt { margin-top: 12px; font-weight: 600; }
+.faq dd { margin: 4px 0 0; color: var(--sub); }
+.crumbs { margin-bottom: 8px; color: var(--sub); font-size: 0.8rem; }
+.cta {
+  display: block;
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+.static .en { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }

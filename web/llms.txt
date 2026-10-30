@@ -1,0 +1,22 @@
+# Bilingual Reader
+
+> 英語の名作（パブリックドメイン）を原文と日本語訳で読む、無料・登録不要の英語多読アプリ。CEFR A1〜C2 のレベル別。単語をタップすると、その文での意味・よく使われる意味・イディオム・発音（発音記号とカタカナ）がわかります。
+
+- 対象：英語を学ぶ日本語話者（初級〜上級）
+- 内容：パブリックドメインの英語の名作の全文と、その日本語訳（段落ごとの対訳）
+- レベル：CEFR A1〜C2 の目安で分類
+- 機能：単語タップで文脈上の意味・よく使われる意味・イディオム・発音（発音記号とカタカナ、アクセント位置）を表示、読んだ単語数と語彙数の記録、単語帳、バックアップ、オフライン対応
+- 料金：無料、会員登録不要。読書記録は利用者の端末内にのみ保存
+
+## 作品（英日対訳の全文）
+
+- [McGuffey's First Eclectic Reader (Lessons LIII–LXII)（マガフィー第一読本（抜粋））](https://bilingual-reader.onrender.com/works/mcguffey-first-reader/): William Holmes McGuffey, 1879年。CEFR A1（入門）、約1,140語
+- [The Tale of Peter Rabbit（ピーターラビットのおはなし）](https://bilingual-reader.onrender.com/works/peter-rabbit/): Beatrix Potter, 1902年。CEFR A2（初級）、約970語
+- [The Selfish Giant（わがままな大男）](https://bilingual-reader.onrender.com/works/selfish-giant/): Oscar Wilde, 1888年。CEFR B1（中級）、約1,660語
+- [A Pair of Silk Stockings（絹のストッキング）](https://bilingual-reader.onrender.com/works/silk-stockings/): Kate Chopin, 1897年。CEFR B2（中上級）、約1,920語
+- [The Gift of the Magi（賢者の贈り物）](https://bilingual-reader.onrender.com/works/gift-of-the-magi/): O. Henry, 1905年。CEFR C1（上級）、約2,070語
+- [The Masque of the Red Death（赤死病の仮面）](https://bilingual-reader.onrender.com/works/masque-of-the-red-death/): Edgar Allan Poe, 1842年。CEFR C2（最上級）、約2,430語
+
+## アプリ
+
+- [Bilingual Reader アプリ](https://bilingual-reader.onrender.com/): 作品を選んで読む。単語のタップで意味と発音、長押しで読んだ位置を記録

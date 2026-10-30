@@ -14,7 +14,7 @@ const WEB = path.join(__dirname, '../web');
 const TOKEN_RE = /[A-Za-z]+(?:['’][A-Za-z]+)*/g;
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css',
-  '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png',
+  '.json': 'application/json', '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.webmanifest': 'application/manifest+json', '.png': 'image/png',
 };
 
 // render.yaml の全ページ共通ヘッダー（Strict-Transport-Security は http では無意味なので除く）
@@ -25,7 +25,8 @@ const RENDER_HEADERS = [...fs.readFileSync(path.join(__dirname, '../render.yaml'
 
 function serve() {
   const server = http.createServer((req, res) => {
-    const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/^\/+/, '') || 'index.html';
+    let rel = decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/^\/+/, '');
+    if (rel === '' || rel.endsWith('/')) rel += 'index.html'; // Render と同じく、フォルダは index.html を返す
     const file = path.join(WEB, rel);
     if (!file.startsWith(WEB) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
       res.statusCode = 404;
@@ -394,6 +395,88 @@ const tests = {
     await page.click('header nav a[href="#/"]');
     await page.waitForSelector('.stats');
     assert.equal(await page.isVisible('#pos'), false);
+  },
+
+  'every word form has a pronunciation with one stressed part'() {
+    const pron = readJson('texts/pron.json');
+    for (const { id } of readJson('texts/index.json')) {
+      for (const w of tokens(readJson(`texts/${id}.json`))) {
+        const entry = pron[key(w)];
+        assert.ok(entry, `${id}: no pronunciation for "${w}"`);
+        const [ipa, kana] = entry;
+        assert.ok(ipa && !ipa.includes('/'), `ipa of ${w}`);
+        assert.match(kana, /^[ァ-ヴー・]*\*[ァ-ヴー・]+\*[ァ-ヴー・]*$/, `kana of ${w}: ${kana}`);
+      }
+    }
+  },
+
+  async 'word panel shows IPA and katakana with the stressed part in bold'({ page, url }) {
+    const pron = readJson('texts/pron.json');
+    await page.goto(`${url}#/read/selfish-giant`);
+    await word(page, 0, 'garden').click();
+    const [ipa, kana] = pron.garden;
+    assert.equal(await page.textContent('#sheet-pron .ipa'), `/${ipa}/`);
+    assert.equal(await page.textContent('#sheet-pron .kana'), kana.replace(/\*/g, ''));
+    assert.equal(await page.textContent('#sheet-pron .kana b'), kana.split('*')[1]);
+    // パネルに隠れる位置の単語（物語の最後の単語も）を押しても、単語がパネルの上に見えて 2 回目を押せる
+    for (const target of [page.locator('.para[data-i="5"] .w').first(), page.locator('.w').last()]) {
+      await target.evaluate((el) => el.scrollIntoView({ block: 'end' }));
+      await target.click();
+      await page.waitForTimeout(100);
+      const [w, panel] = await Promise.all([target.boundingBox(), page.locator('#sheet').boundingBox()]);
+      assert.ok(w.y + w.height <= panel.y, 'word is above the panel');
+      await target.click();
+      assert.match(await page.textContent('#sheet-status'), /登録しました/);
+    }
+    // 活用形はその語形の発音（原形ではなく ran の発音）
+    await word(page, 3, 'ran').click();
+    assert.equal(await page.textContent('#sheet-pron .ipa'), `/${pron.ran[0]}/`);
+  },
+
+  'search pages are up to date with the texts'() {
+    const { execFileSync } = require('node:child_process');
+    execFileSync(process.execPath, [path.join(__dirname, '../tools/build-pages.mjs'), '--check'], { stdio: 'pipe' });
+  },
+
+  async 'each work has a crawlable full-text page with metadata'({ page, url }) {
+    const site = JSON.parse(fs.readFileSync(path.join(__dirname, '../tools/site.json'), 'utf8'));
+    const sitemap = fs.readFileSync(path.join(WEB, 'sitemap.xml'), 'utf8');
+    assert.match(fs.readFileSync(path.join(WEB, 'robots.txt'), 'utf8'), new RegExp(`Sitemap: ${site.url}/sitemap.xml`));
+    const llms = fs.readFileSync(path.join(WEB, 'llms.txt'), 'utf8');
+    for (const { id, title } of readJson('texts/index.json')) {
+      const work = readJson(`texts/${id}.json`);
+      assert.match(sitemap, new RegExp(`<loc>${site.url}/works/${id}/</loc>`));
+      assert.ok(llms.includes(`${site.url}/works/${id}/`), `llms.txt lists ${id}`);
+      await page.goto(`${url}works/${id}/`);
+      assert.match(await page.title(), new RegExp(title.replace(/[()]/g, '.')));
+      assert.equal(await page.getAttribute('link[rel=canonical]', 'href'), `${site.url}/works/${id}/`);
+      assert.ok((await page.getAttribute('meta[name=description]', 'content')).length > 50);
+      // 本文（原文と和訳）がそのまま HTML に入っている（JavaScript なしで読める）
+      assert.equal(await page.locator('.para .en').count(), work.paragraphs.length);
+      assert.equal(await page.locator('.para .ja').count(), work.paragraphs.length);
+      assert.equal(await page.textContent('.para:last-child .en'), work.paragraphs.at(-1).en);
+      const lds = await page.locator('script[type="application/ld+json"]').allTextContents();
+      const types = lds.map((t) => JSON.parse(t)['@type']);
+      assert.deepEqual(types, ['LearningResource', 'BreadcrumbList']);
+      assert.equal(JSON.parse(lds[0]).educationalLevel, `CEFR ${work.level}`);
+      assert.equal(await page.getAttribute('a.cta', 'href'), `/#/read/${id}`);
+    }
+  },
+
+  async 'home page has a crawlable description that stays in the app'({ page, url }) {
+    const html = fs.readFileSync(path.join(WEB, 'index.html'), 'utf8');
+    assert.match(html, /<meta name="description"/);
+    assert.match(html, /<h1>英語の名作を、原文と日本語訳で読む<\/h1>/);
+    assert.match(html, /href="\/works\/selfish-giant\/"/);
+    await page.goto(url);
+    await page.waitForSelector('.stats');
+    assert.equal(await page.locator('main > .intro').count(), 0, 'app screen replaces the static intro');
+    await page.click('.about summary');
+    assert.match(await page.textContent('.about'), /よくある質問/);
+    assert.equal(await page.locator('.about .intro-works').count(), 0, 'no duplicate work list');
+    await page.goto(`${url}#/read/peter-rabbit`);
+    await page.waitForSelector('.para');
+    assert.equal(await page.locator('.intro').count(), 0);
   },
 
   async 'Japanese toggle is remembered'({ page, url }) {
