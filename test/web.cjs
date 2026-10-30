@@ -353,6 +353,49 @@ const tests = {
     assert.equal(await page.locator('#backup-share').count(), (await page.evaluate(() => !!navigator.canShare)) ? 1 : 0);
   },
 
+  async 'shows how far through the story the screen is'({ page, url }) {
+    const pos = async () => {
+      await page.waitForTimeout(100); // スクロール後の再計算（次のフレーム）を待つ
+      return Number((await page.textContent('#pos')).replace('%', ''));
+    };
+    await page.goto(url);
+    await page.waitForSelector('.stats');
+    assert.equal(await page.isVisible('#pos'), false, 'only on the reading screen');
+
+    await page.goto(`${url}#/read/selfish-giant`);
+    await page.waitForSelector('.para');
+    assert.equal(await page.isVisible('#pos'), true);
+    assert.equal(await pos(), 0);
+
+    const height = await page.evaluate(() => document.querySelector('.paras').getBoundingClientRect().height);
+    await page.evaluate((y) => window.scrollTo(0, y), height / 3);
+    const third = await pos();
+    await page.evaluate((y) => window.scrollTo(0, y), (height * 2) / 3);
+    const twoThirds = await pos();
+    assert.ok(third > 0 && third < twoThirds && twoThirds < 100, `${third} < ${twoThirds}`);
+
+    // 最後の段落の最後が画面に入ったら 100%
+    await page.locator('.para').last().evaluate((el) => el.scrollIntoView({ block: 'end' }));
+    assert.equal(await pos(), 100);
+    assert.equal(await page.locator('#pos-bar > div').evaluate((el) => el.style.width), '100%');
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); // その先（読了ボタン）でも 100% のまま
+    assert.equal(await pos(), 100);
+    // 少し戻すと 100% 未満
+    await page.evaluate(() => window.scrollBy(0, -window.innerHeight));
+    assert.ok((await pos()) < 100);
+
+    // 和訳を隠すと本文が短くなるが、位置は 0〜100% に収まる
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.click('.toggle');
+    assert.equal(await pos(), 0);
+    await page.locator('.para').last().evaluate((el) => el.scrollIntoView({ block: 'end' }));
+    assert.equal(await pos(), 100);
+
+    await page.click('header nav a[href="#/"]');
+    await page.waitForSelector('.stats');
+    assert.equal(await page.isVisible('#pos'), false);
+  },
+
   async 'Japanese toggle is remembered'({ page, url }) {
     await page.goto(`${url}#/read/selfish-giant`);
     assert.equal(await page.isVisible('.para[data-i="0"] .ja'), true);

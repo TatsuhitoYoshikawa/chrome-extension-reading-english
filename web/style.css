@@ -55,6 +55,12 @@ button { font: inherit; color: inherit; }
 .brand { font-weight: 700; text-decoration: none; }
 .bar nav a { margin-left: 16px; text-decoration: none; }
 
+/* 物語のどこを表示しているか（%）。本文を読む画面だけで出す */
+#pos { margin-left: auto; color: var(--sub); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+#pos-bar { position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--line); }
+#pos-bar > div { height: 100%; width: 0; background: var(--accent); }
+#pos[hidden], #pos-bar[hidden] { display: none; }
+
 main {
   max-width: 680px;
   margin: 0 auto;
