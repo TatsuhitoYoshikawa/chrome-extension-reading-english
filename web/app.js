@@ -53,6 +53,7 @@ const getIndex = () => getJson('texts/index.json');
 const getCommon = () => getJson('texts/common.json');
 const getLemmas = () => getJson('texts/lemmas.json');
 const getDict = () => getJson('texts/dict.json'); // 原形ごとの「よく使われる意味」と「イディオム」
+const getPron = () => getJson('texts/pron.json'); // 語形ごとの [発音記号, カタカナ（*強勢*）]
 const getWork = (id) => getJson(`texts/${encodeURIComponent(id)}.json`);
 
 /** 単語の見出し形。小文字にし、所有格の 's は外す（Giant's → giant） */
@@ -124,6 +125,10 @@ const finishedCount = (id) => state.finished.filter((f) => f.id === id).length;
 // ---------------------------------------------------------------------------
 
 const main = document.getElementById('main');
+// index.html に書いてあるサイトの説明（検索エンジン向け）。本棚の画面のいちばん下に「このアプリについて」として出す
+const intro = main.querySelector('.intro');
+intro?.querySelector('.intro-works')?.remove(); // 作品の一覧は本棚と重なるので外す
+main.replaceChildren();
 
 function h(tag, props = {}, ...children) {
   const el = document.createElement(tag);
@@ -238,6 +243,7 @@ async function homeView() {
       h('p', { class: 'sub' }, 'レベルは CEFR（ヨーロッパ言語共通参照枠）での目安です。'),
       ...shelf,
       backupSection(),
+      intro ? h('details', { class: 'about' }, h('summary', {}, 'このアプリについて'), intro) : null,
     ],
   };
 }
@@ -247,7 +253,8 @@ function stat(label, value, id) {
 }
 
 async function readerView(id) {
-  const [work, common, lemmas, dict] = await Promise.all([getWork(id), getCommon(), getLemmas(), getDict()]);
+  const [work, common, lemmas, dict, pron] = await Promise.all(
+    [getWork(id), getCommon(), getLemmas(), getDict(), getPron()]);
   const jaToggle = h('button', { type: 'button', class: 'toggle' });
   const setJa = () => {
     main.classList.toggle('hide-ja', !state.showJa);
@@ -266,7 +273,7 @@ async function readerView(id) {
     en.append(p.en.slice(last));
     en.addEventListener('click', (e) => {
       const span = e.target.closest('.w');
-      if (span && !longPressed) onWord(span, p, work, common, lemmas, dict);
+      if (span && !longPressed) onWord(span, p, work, { common, lemmas, dict, pron });
     });
     return h('section', { class: 'para', 'data-i': i },
       p.head ? h('h2', { class: 'lesson', lang: 'en' }, p.head) : null,
@@ -402,7 +409,7 @@ document.addEventListener('click', (e) => {
   if (!sheet.hidden && !e.target.closest('.w, #sheet')) closeSheet();
 });
 
-function onWord(span, para, work, common, lemmas, dict) {
+function onWord(span, para, work, { common, lemmas, dict, pron }) {
   const word = span.textContent;
   const lemma = lemmaOf(word, lemmas);
   const { text: sentence } = sentenceAt(para.en, Number(span.dataset.pos)); // 単語帳に一緒に保存する
@@ -419,6 +426,10 @@ function onWord(span, para, work, common, lemmas, dict) {
   const wordEl = document.getElementById('sheet-word');
   wordEl.replaceChildren(word);
   if (lemma !== wordKey(word)) wordEl.append(h('small', {}, `原形 ${lemma}`));
+  const [ipa, kana] = pron[wordKey(word)] ?? pron[word.toLowerCase().replace(/’/g, "'")] ?? [];
+  document.getElementById('sheet-pron').replaceChildren(...(ipa
+    ? [h('span', { class: 'ipa', lang: 'en' }, `/${ipa}/`), ' ', kanaNodes(kana)]
+    : []));
   document.getElementById('sheet-meaning').textContent = meaning ?? '（この単語の訳は未登録です）';
   const entry = dict[lemma] ?? dict[wordKey(word)] ?? {};
   document.getElementById('sheet-more').replaceChildren(...[
@@ -433,6 +444,14 @@ function onWord(span, para, work, common, lemmas, dict) {
   ].filter(Boolean));
   setStatus(isSaved(wordKey(word), sentence) ? '登録済み' : 'もう一度タップで単語帳に登録');
   sheet.hidden = false;
+  // パネルの下に単語が隠れたら、もう一度タップできるよう単語をパネルの上まで送る
+  const gap = span.getBoundingClientRect().bottom - sheet.getBoundingClientRect().top;
+  if (gap > -8) window.scrollBy(0, gap + 48);
+}
+
+/** "ジャ*イ*アント" の * で囲んだ部分（強勢）を太字にする */
+function kanaNodes(kana) {
+  return h('span', { class: 'kana' }, kana.split('*').map((part, i) => (i % 2 ? h('b', {}, part) : part)));
 }
 
 function isSaved(w, s) {
