@@ -3,7 +3,7 @@
 英語の名作（著作権切れ）を、日本語訳を並べて読む自分用の英語学習ウェブアプリです。スマホ（Android の Chrome）で使うことを前提にしています。
 
 - 英文の段落ごとに日本語訳を表示します（「和訳を隠す」で英文だけにもできます）。
-- **単語をタップ**すると、**その文の中での意味**と、その単語を含む 1 文を画面下に表示します。
+- **単語をタップ**すると、画面下に **その文の中での意味**、**他によく使われる意味**、**その単語を使うイディオム・成句** を表示します。
 - **同じ単語をもう一度タップ**すると単語帳に登録します。
 - **単語を長押し**すると、作品の先頭からその単語までを「読んだ」として記録します。
 - 作品の最後にある **「読了」ボタン**を押すと、その作品を最後まで読んだことを記録します。同じ作品は何度でも読み返せます。
@@ -13,7 +13,20 @@
 - 記録はすべて **この端末のブラウザの中だけ**（localStorage）に保存します。サーバーへは何も送らず、次に開いたときもそのまま残っています。
 - 一度開けば、オフラインでも読めます。
 
-現在の収録作品：Oscar Wilde『The Selfish Giant（わがままな大男）』（1888）
+## 収録作品
+
+本棚は CEFR（ヨーロッパ言語共通参照枠）のレベル順に並びます。レベルは語彙と文の難しさから付けた **目安** で、公式な認定ではありません。
+
+| レベル | 作品 | 作者・年 | 語数 |
+|---|---|---|---|
+| A1 入門 | McGuffey's First Eclectic Reader（第 53〜62 課の抜粋） | William Holmes McGuffey, 1879 | 約 1,100 |
+| A2 初級 | The Tale of Peter Rabbit（ピーターラビットのおはなし） | Beatrix Potter, 1902 | 約 970 |
+| B1 中級 | The Selfish Giant（わがままな大男） | Oscar Wilde, 1888 | 約 1,660 |
+| B2 中上級 | A Pair of Silk Stockings（絹のストッキング） | Kate Chopin, 1897 | 約 1,900 |
+| C1 上級 | The Gift of the Magi（賢者の贈り物） | O. Henry, 1905 | 約 2,100 |
+| C2 最上級 | The Masque of the Red Death（赤死病の仮面） | Edgar Allan Poe, 1842 | 約 2,400 |
+
+本文はすべて Project Gutenberg のパブリックドメインの原文です。和訳と語義はこのアプリ用に新しく作成したものです（既存の日本語訳は使っていません）。
 
 ---
 
@@ -21,8 +34,8 @@
 
 | 操作 | 動き |
 |---|---|
-| 単語をタップ | 画面下に意味と、その単語を含む 1 文を表示（単語は黄色で強調） |
-| 同じ単語をもう一度タップ | 単語帳に登録（同じ文の同じ単語は二重に登録しない） |
+| 単語をタップ | 画面下に「この文での意味」「よく使われる意味」（品詞つき）「イディオム・成句」を表示（単語は黄色で強調。イディオムが無い単語は省略） |
+| 同じ単語をもう一度タップ | 単語帳に登録。単語帳には、あとで見返せるよう単語を含む 1 文も一緒に保存する（同じ文の同じ単語は二重に登録しない） |
 | 単語・パネル以外をタップ、または × | パネルを閉じる |
 | 単語を長押し（約 0.5 秒） | 作品の先頭からその単語までを既読にする。既読の単語は薄い色になり、最後に読んだ単語に緑の下線が付く |
 | 既読の範囲より前の単語を長押し | 既読の範囲をその単語まで戻す |
@@ -121,7 +134,7 @@ python3 -m http.server -d web 8000
 
 ### 確認すること
 
-1. 本棚に「The Selfish Giant」があり、数字がすべて 0 になっている。
+1. 本棚に A1〜C2 のレベル別に 6 作品が並び、数字がすべて 0 になっている。
 2. 作品を開き、単語をタップすると、下に意味と文が出る。別の単語をタップすると切り替わる。
 3. 同じ単語をもう一度タップすると「単語帳に登録しました」と出て、「単語帳」の画面に表示される。
 4. 2 段落目の最後の単語を長押しすると、下に「ここまで読みました」と出る。本棚に戻ると、総単語数と総語彙数が増えている。
@@ -172,6 +185,7 @@ npm test
 
 ```
 render.yaml                 Render での公開設定（公開フォルダ・HTTP ヘッダー）
+CLAUDE.md                   Claude で作業するときのルール（作品追加の手順など）
 web/                        ← 公開するのはこのフォルダだけ
   index.html
   app.js                    画面・単語タップ・単語帳・読書記録・単語数の計算
@@ -181,9 +195,10 @@ web/                        ← 公開するのはこのフォルダだけ
   icon-192.png, icon-512.png
   texts/
     index.json              本棚に並べる作品の一覧
-    common.json             どの作品でも使う基本語の意味（the, of など）
+    common.json             どの作品でも使う基本語の「この文での意味」の既定値（the, of など）
+    dict.json               原形ごとの「よく使われる意味」と「イディオム・成句」
     lemmas.json             活用形 → 原形の対応表（単語の種類を数えるため）
-    selfish-giant.json      作品ごとの本文・和訳・語釈
+    <作品ID>.json           作品ごとの本文・和訳・語義（6 作品）
 test/web.cjs                ウェブアプリの自動テスト
 ```
 
@@ -192,6 +207,7 @@ test/web.cjs                ウェブアプリの自動テスト
 ```jsonc
 {
   "id": "selfish-giant",            // ファイル名と同じ
+  "level": "B1",                    // CEFR の目安（A1〜C2）
   "title": "The Selfish Giant",
   "titleJa": "わがままな大男",
   "author": "Oscar Wilde",
@@ -199,6 +215,7 @@ test/web.cjs                ウェブアプリの自動テスト
   "source": "Project Gutenberg eBook #902 …",
   "paragraphs": [
     {
+      "head": "Lesson LIII",                                         // （任意）この段落の前に出す見出し
       "en": "EVERY afternoon, as they were coming from school, …",  // 原文
       "ja": "毎日午後、学校から帰る途中、…",                          // 和訳
       "g": { "afternoon": "午後", "used": "（used to で）以前はよく〜したものだ" }  // この段落での語義
@@ -210,11 +227,23 @@ test/web.cjs                ウェブアプリの自動テスト
 単語の意味は、その段落の `g` → `common.json` の順に探します。キーは小文字で、所有格は `giant's` のまま書いても `giant` でも見つかります。
 同じ単語でも段落ごとに意味を書き分けられるので、文脈に合った意味を表示できます。
 
+「よく使われる意味」と「イディオム・成句」は、作品に関係なく `dict.json` に原形ごとにまとめています。
+
+```jsonc
+"run": {
+  "m": ["〔動〕走る", "〔動〕（会社・店などを）経営する", "〔動〕（機械が）動く"],  // よく使われる意味（多い順）
+  "i": [["run out of", "〜を使い果たす"], ["run into", "〜に偶然出会う"]]       // イディオム・成句（無ければ []）
+}
+```
+
 ### 作品を追加するには
 
 1. [Project Gutenberg](https://www.gutenberg.org/) などから、著作権の切れた英語の原文を選びます。
-2. 段落ごとに和訳と語義（`g`）を付けた JSON を `web/texts/` に置き、`web/texts/index.json` に 1 行追加します。新しく出てきた活用形は `web/texts/lemmas.json` に追加します。
-3. `npm test` で、全単語に意味が付いているかを確認します。
+2. 段落ごとに和訳と語義（`g`）を付けた JSON を `web/texts/` に置き、`web/texts/index.json` にレベル順で 1 行追加します。新しく出てきた活用形は `web/texts/lemmas.json` に、新しく出てきた原形は `web/texts/dict.json` に追加します。
+3. **和訳を見直して直します。** 訳を作ったのとは別の目で、全段落を英文と一文ずつ突き合わせ、誤訳・訳抜け・付け足し・名前や文体の不統一・不自然な日本語・語義（`g`）のずれを直します。**この見直しと修正が終わるまでは完成としません。**
+4. `npm test` で、全単語に「この文での意味」と辞書の項目があるかを確認します。
+
+この手順は `CLAUDE.md` にも書いてあり、Claude で作業するときはこれに従います。
 
 和訳と語義の作成は手間がかかるので、作品名を指定してもらえれば、こちらで作って追加します。
 
@@ -222,5 +251,12 @@ test/web.cjs                ウェブアプリの自動テスト
 
 ## 出典
 
-- Oscar Wilde, “The Selfish Giant”, *The Happy Prince and Other Tales* (1888). 本文は [Project Gutenberg eBook #902](https://www.gutenberg.org/ebooks/902) より（パブリックドメイン）。
+本文はすべて Project Gutenberg のパブリックドメインのテキストです。
+
+- William Holmes McGuffey, *McGuffey's First Eclectic Reader, Revised Edition* (1879) — [eBook #14640](https://www.gutenberg.org/ebooks/14640)
+- Beatrix Potter, *The Tale of Peter Rabbit* (1902) — [eBook #14838](https://www.gutenberg.org/ebooks/14838)
+- Oscar Wilde, “The Selfish Giant”, *The Happy Prince and Other Tales* (1888) — [eBook #902](https://www.gutenberg.org/ebooks/902)
+- Kate Chopin, “A Pair of Silk Stockings” (1897), *The Awakening, and Selected Short Stories* — [eBook #160](https://www.gutenberg.org/ebooks/160)
+- O. Henry, “The Gift of the Magi” (1905) — [eBook #7256](https://www.gutenberg.org/ebooks/7256)
+- Edgar Allan Poe, “The Masque of the Red Death” (1842) — [eBook #1064](https://www.gutenberg.org/ebooks/1064)
 - 和訳と語義はこのアプリ用に新しく作成したものです。

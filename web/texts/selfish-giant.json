@@ -1,5 +1,6 @@
 {
  "id": "selfish-giant",
+ "level": "B1",
  "title": "The Selfish Giant",
  "titleJa": "わがままな大男",
  "author": "Oscar Wilde",
@@ -69,14 +70,14 @@
   },
   {
    "en": "One day the Giant came back. He had been to visit his friend the Cornish ogre, and had stayed with him for seven years. After the seven years were over he had said all that he had to say, for his conversation was limited, and he determined to return to his own castle. When he arrived he saw the children playing in the garden.",
-   "ja": "ある日、大男が帰ってきました。彼はコーンウォールの人食い鬼の友だちを訪ねて、七年間そこに滞在していたのです。七年がたつと、話すことはすべて話しつくしてしまったので（なにしろ彼の話題は限られていたのです）、自分の城に帰ることにしました。帰ってくると、子どもたちが庭で遊んでいるのが見えました。",
+   "ja": "ある日、大男が帰ってきました。彼は友だちであるコーンウォールの人食い鬼を訪ねて、七年間そこに滞在していたのです。七年がたつと、話すことはすべて話しつくしてしまったので（なにしろ彼の話題は限られていたのです）、自分の城に帰ることにしました。帰ってくると、子どもたちが庭で遊んでいるのが見えました。",
    "g": {
     "day": "日（one day で ある日）",
     "back": "戻って（come back で 帰ってくる）",
     "had": "（had＋過去分詞で）〜していた（過去完了）／（had to で）〜しなければならなかった",
     "been": "（had been to visit で）訪ねに行っていた",
     "visit": "訪ねる",
-    "friend": "友だち",
+    "friend": "友だち（his friend the Cornish ogre で 友だちであるコーンウォールの人食い鬼）",
     "cornish": "コーンウォール（イングランド南西部）の",
     "ogre": "人食い鬼",
     "stayed": "滞在した",
@@ -100,12 +101,12 @@
   },
   {
    "en": "“What are you doing here?” he cried in a very gruff voice, and the children ran away.",
-   "ja": "「ここで何をしているんだ？」と大男がひどくしわがれた乱暴な声でどなると、子どもたちは逃げていきました。",
+   "ja": "「ここで何をしているんだ？」と大男がひどく荒々しい声でどなると、子どもたちは逃げていきました。",
    "g": {
     "doing": "している（do の ing 形）",
     "cried": "どなった・叫んだ（cry の過去形）",
     "in": "（in a ... voice で）〜な声で",
-    "gruff": "ぶっきらぼうな・しわがれた",
+    "gruff": "荒々しい・ぶっきらぼうな",
     "voice": "声",
     "ran": "走った（run の過去形）",
     "away": "離れて（run away で 逃げる）"
@@ -147,7 +148,7 @@
   },
   {
    "en": "He was a very selfish Giant.",
-   "ja": "彼はとても自分勝手な大男でした。",
+   "ja": "彼はとてもわがままな大男でした。",
    "g": {
     "selfish": "自分勝手な・わがままな"
    }
@@ -186,7 +187,7 @@
   },
   {
    "en": "Then the Spring came, and all over the country there were little blossoms and little birds. Only in the garden of the Selfish Giant it was still winter. The birds did not care to sing in it as there were no children, and the trees forgot to blossom. Once a beautiful flower put its head out from the grass, but when it saw the notice-board it was so sorry for the children that it slipped back into the ground again, and went off to sleep. The only people who were pleased were the Snow and the Frost. “Spring has forgotten this garden,” they cried, “so we will live here all the year round.” The Snow covered up the grass with her great white cloak, and the Frost painted all the trees silver. Then they invited the North Wind to stay with them, and he came. He was wrapped in furs, and he roared all day about the garden, and blew the chimney-pots down. “This is a delightful spot,” he said, “we must ask the Hail on a visit.” So the Hail came. Every day for three hours he rattled on the roof of the castle till he broke most of the slates, and then he ran round and round the garden as fast as he could go. He was dressed in grey, and his breath was like ice.",
-   "ja": "やがて春が来て、国じゅうに小さな花が咲き、小鳥たちがやって来ました。ただ自分勝手な大男の庭だけは、まだ冬のままでした。子どもたちがいないので、鳥たちはそこで歌う気にならず、木々は花を咲かせるのを忘れてしまいました。一度、美しい花が一輪、芝生から顔を出しましたが、立て札を見ると子どもたちがあまりにかわいそうになって、また地面の中へするりと戻り、眠りについてしまいました。喜んだのは雪と霜だけでした。「春はこの庭のことを忘れてしまった。だから一年じゅうここに住もう」と彼らは叫びました。雪は大きな白いマントで芝生をおおい、霜は木々をすべて銀色に塗りました。それから彼らは北風を招いていっしょに暮らそうと誘い、北風はやって来ました。北風は毛皮にくるまり、一日じゅう庭をうなりながら吹きまわり、煙突の通風管を吹き倒しました。「ここはすばらしい場所だ。あられも呼ぼう」と北風は言いました。そこであられがやって来ました。あられは毎日三時間、城の屋根をバラバラと打ちつけて、屋根のスレートをほとんど割ってしまい、それから全速力で庭をぐるぐると駆けまわりました。あられは灰色の服を着て、その息は氷のようでした。",
+   "ja": "やがて春が来て、国じゅうどこにも小さな花が咲き、小鳥たちの姿がありました。ただわがままな大男の庭だけは、まだ冬のままでした。子どもたちがいないので、鳥たちはそこで歌う気にならず、木々は花を咲かせるのを忘れてしまいました。一度、美しい花が一輪、芝生から顔を出しましたが、立て札を見ると子どもたちがあまりにかわいそうになって、また地面の中へするりと戻り、眠りについてしまいました。喜んだのは雪と霜だけでした。「春はこの庭のことを忘れてしまった。だから一年じゅうここに住もう」と彼らは叫びました。雪は大きな白いマントで芝生をおおい、霜は木々をすべて銀色に塗りました。それから雪と霜は北風に、いっしょに泊まりにおいでと誘い、北風はやって来ました。北風は毛皮にくるまり、一日じゅう庭をうなりながら吹きまわり、煙突のてっぺんの筒を吹き倒しました。「ここはすばらしい場所だ。あられも呼ぼう」と北風は言いました。そこであられがやって来ました。あられは毎日三時間、城の屋根をバラバラと打ちつけて、屋根のスレートをほとんど割ってしまい、それから全速力で庭をぐるぐると駆けまわりました。あられは灰色の服を着て、その息は氷のようでした。",
    "g": {
     "then": "やがて・それから",
     "all": "（all over で）〜じゅうに／（all the year round で）一年じゅう／（all day で）一日じゅう",
@@ -240,7 +241,7 @@
     "invited": "招いた（invite＋人＋to〜で 人に〜するよう誘う）",
     "north": "北の（North Wind で 北風）",
     "wind": "風（North Wind で 北風・擬人化）",
-    "stay": "滞在する",
+    "stay": "泊まる・滞在する（stay with で 〜のところに泊まる）",
     "he": "彼（擬人化された北風・あられ）",
     "wrapped": "くるまれた",
     "furs": "毛皮",
@@ -249,7 +250,7 @@
     "about": "あちこちを",
     "blew": "吹いた（blow の過去形。blow down で 吹き倒す）",
     "chimney": "煙突",
-    "pots": "（chimney-pots で）煙突の頂部の通風管",
+    "pots": "（chimney-pots で）煙突のてっぺんの筒（通風用の土管）",
     "delightful": "すばらしい・愉快な",
     "spot": "場所",
     "must": "〜しなければならない",
@@ -277,7 +278,7 @@
   },
   {
    "en": "“I cannot understand why the Spring is so late in coming,” said the Selfish Giant, as he sat at the window and looked out at his cold white garden; “I hope there will be a change in the weather.”",
-   "ja": "「なぜ春がこんなに来るのが遅いのか、わからん」と、自分勝手な大男は窓辺に座り、寒々とした白い庭を眺めながら言いました。「天気が変わるといいのだが」",
+   "ja": "「なぜ春がこんなに来るのが遅いのか、わからん」と、わがままな大男は窓辺に座り、寒々とした白い庭を眺めながら言いました。「天気が変わるといいのだが」",
    "g": {
     "cannot": "〜できない",
     "understand": "理解する",
@@ -298,7 +299,7 @@
   },
   {
    "en": "But the Spring never came, nor the Summer. The Autumn gave golden fruit to every garden, but to the Giant’s garden she gave none. “He is too selfish,” she said. So it was always Winter there, and the North Wind, and the Hail, and the Frost, and the Snow danced about through the trees.",
-   "ja": "けれども春は来ず、夏も来ませんでした。秋はどの庭にも金色の実を与えましたが、大男の庭には何も与えませんでした。「あの人は自分勝手すぎる」と秋は言いました。そのため、そこはいつも冬で、北風とあられと霜と雪が木々の間を踊りまわっていました。",
+   "ja": "けれども春はとうとう来ず、夏も来ませんでした。秋はどの庭にも金色の実を与えましたが、大男の庭には何も与えませんでした。「あの人はわがまますぎる」と秋は言いました。そのため、そこはいつも冬で、北風とあられと霜と雪が木々の間を踊りまわっていました。",
    "g": {
     "nor": "（nor the Summer で）夏もまた来なかった",
     "summer": "夏",
@@ -325,7 +326,7 @@
   },
   {
    "en": "One morning the Giant was lying awake in bed when he heard some lovely music. It sounded so sweet to his ears that he thought it must be the King’s musicians passing by. It was really only a little linnet singing outside his window, but it was so long since he had heard a bird sing in his garden that it seemed to him to be the most beautiful music in the world. Then the Hail stopped dancing over his head, and the North Wind ceased roaring, and a delicious perfume came to him through the open casement. “I believe the Spring has come at last,” said the Giant; and he jumped out of bed and looked out.",
-   "ja": "ある朝、大男がベッドで目を覚ましたまま横になっていると、美しい音楽が聞こえてきました。それはとても甘く耳に響いたので、王さまの楽隊が通りかかっているにちがいないと思いました。本当は小さなムネアカヒワが窓の外で歌っているだけだったのですが、庭で鳥が歌うのを聞くのはあまりに久しぶりだったので、彼には世界でいちばん美しい音楽のように思えたのです。すると、頭の上で踊っていたあられが止まり、北風はうなるのをやめ、開いた窓からうっとりするような香りが漂ってきました。「とうとう春が来たようだ」と大男は言い、ベッドから飛び起きて外を見ました。",
+   "ja": "ある朝、大男がベッドで目を覚ましたまま横になっていると、美しい音楽が聞こえてきました。それはとても甘く耳に響いたので、王さまの楽隊が通りかかっているにちがいないと思いました。本当は小さなムネアカヒワが窓の外で歌っているだけだったのですが、庭で鳥が歌うのを聞くのはあまりに久しぶりだったので、彼には世界でいちばん美しい音楽のように思えたのです。すると、頭の上で踊っていたあられは踊るのをやめ、北風はうなるのをやめ、開いた窓からうっとりするような香りが漂ってきました。「とうとう春が来たようだ」と大男は言い、ベッドから飛び起きて外を見ました。",
    "g": {
     "morning": "朝",
     "lying": "横になっている（lie の ing 形）",
@@ -385,7 +386,7 @@
   },
   {
    "en": "He saw a most wonderful sight. Through a little hole in the wall the children had crept in, and they were sitting in the branches of the trees. In every tree that he could see there was a little child. And the trees were so glad to have the children back again that they had covered themselves with blossoms, and were waving their arms gently above the children’s heads. The birds were flying about and twittering with delight, and the flowers were looking up through the green grass and laughing. It was a lovely scene, only in one corner it was still winter. It was the farthest corner of the garden, and in it was standing a little boy. He was so small that he could not reach up to the branches of the tree, and he was wandering all round it, crying bitterly. The poor tree was still quite covered with frost and snow, and the North Wind was blowing and roaring above it. “Climb up! little boy,” said the Tree, and it bent its branches down as low as it could; but the boy was too tiny.",
-   "ja": "彼はなんともすばらしい光景を目にしました。塀の小さな穴から子どもたちがこっそり入り込み、木々の枝に座っていたのです。見える木という木に、小さな子どもがひとりずついました。木々は子どもたちがまた戻ってきてくれたのがとてもうれしくて、全身を花で飾り、子どもたちの頭の上でやさしく腕を揺らしていました。鳥たちは喜んでさえずりながら飛びまわり、花々は緑の芝生から顔を上げて笑っていました。それは美しい光景でしたが、ただ一か所の隅だけはまだ冬でした。それは庭のいちばん奥の隅で、そこには小さな男の子が立っていました。男の子はとても小さかったので木の枝に手が届かず、ひどく泣きながら木のまわりをうろうろしていました。かわいそうに、その木はまだすっかり霜と雪におおわれていて、その上では北風がうなりながら吹いていました。「登っておいで、坊や！」と木は言い、できるだけ低く枝を下げてやりましたが、男の子はあまりにも小さすぎました。",
+   "ja": "彼はなんともすばらしい光景を目にしました。塀の小さな穴から子どもたちがこっそり入り込み、木々の枝に座っていたのです。見える木という木に、小さな子どもがひとりずついました。木々は子どもたちがまた戻ってきてくれたのがとてもうれしくて、全身を花で飾り、子どもたちの頭の上でやさしく腕を揺らしていました。鳥たちは喜んでさえずりながら飛びまわり、花々は緑の芝生から顔を上げて笑っていました。それは美しい光景でしたが、ただ一か所の隅だけはまだ冬でした。それは庭のいちばん奥の隅で、そこには小さな男の子が立っていました。男の子はとても小さかったので木の枝に手が届かず、激しく泣きじゃくりながら木のまわりをうろうろしていました。かわいそうに、その木はまだすっかり霜と雪におおわれていて、その上では北風がうなりながら吹いていました。「登っておいで、坊や！」と木は言い、できるだけ低く枝を下げてやりましたが、男の子はあまりにも小さすぎました。",
    "g": {
     "most": "（a most＋形容詞で）とても〜な",
     "wonderful": "すばらしい",
@@ -429,7 +430,7 @@
     "reach": "（reach up to で）〜に手を伸ばして届く",
     "wandering": "歩き回っている",
     "crying": "泣いている",
-    "bitterly": "ひどく・激しく",
+    "bitterly": "激しく・悲しげに（cry bitterly で 激しく泣く）",
     "poor": "かわいそうな",
     "quite": "すっかり",
     "frost": "霜",
@@ -447,7 +448,7 @@
   },
   {
    "en": "And the Giant’s heart melted as he looked out. “How selfish I have been!” he said; “now I know why the Spring would not come here. I will put that poor little boy on the top of the tree, and then I will knock down the wall, and my garden shall be the children’s playground for ever and ever.” He was really very sorry for what he had done.",
-   "ja": "外を見ているうちに、大男の心はとけていきました。「わしはなんて自分勝手だったのだろう！」と彼は言いました。「なぜ春がここに来ようとしなかったのか、今わかった。あのかわいそうな男の子を木のてっぺんに乗せてやろう。それから塀を打ち壊して、わしの庭をいつまでも子どもたちの遊び場にしよう」。彼は自分のしたことを心から後悔していました。",
+   "ja": "外を見ているうちに、大男の心はとけていきました。「わしはなんてわがままだったのだろう！」と彼は言いました。「なぜ春がここに来ようとしなかったのか、今わかった。あのかわいそうな男の子を木のてっぺんに乗せてやろう。それから塀を打ち壊して、わしの庭をいつまでも子どもたちの遊び場にしよう」。彼は自分のしたことを心から後悔していました。",
    "g": {
     "giant's": "大男の",
     "heart": "心",
@@ -479,7 +480,7 @@
   },
   {
    "en": "So he crept downstairs and opened the front door quite softly, and went out into the garden. But when the children saw him they were so frightened that they all ran away, and the garden became winter again. Only the little boy did not run, for his eyes were so full of tears that he did not see the Giant coming. And the Giant stole up behind him and took him gently in his hand, and put him up into the tree. And the tree broke at once into blossom, and the birds came and sang on it, and the little boy stretched out his two arms and flung them round the Giant’s neck, and kissed him. And the other children, when they saw that the Giant was not wicked any longer, came running back, and with them came the Spring. “It is your garden now, little children,” said the Giant, and he took a great axe and knocked down the wall. And when the people were going to market at twelve o’clock they found the Giant playing with the children in the most beautiful garden they had ever seen.",
-   "ja": "そこで大男はそっと階段を下り、玄関の扉を静かに開けて庭へ出ていきました。けれども子どもたちは大男を見ると、すっかりおびえてみんな逃げてしまい、庭はまた冬になってしまいました。ただあの小さな男の子だけは逃げませんでした。目に涙がいっぱいで、大男が来るのが見えなかったのです。大男は男の子の後ろにそっと近づき、やさしく手に抱き上げて、木の上に乗せてやりました。するとその木はたちまち花を咲かせ、鳥たちがやって来てその上で歌い、男の子は両腕をのばして大男の首に抱きつき、キスをしました。ほかの子どもたちは、大男がもう意地悪ではないとわかると、走って戻ってきて、子どもたちといっしょに春もやって来ました。「今日からここは君たちの庭だよ、子どもたち」と大男は言い、大きな斧を手に取って塀を打ち壊しました。十二時に市場へ向かう人々は、大男がこれまで見たこともないほど美しい庭で子どもたちと遊んでいるのを目にしました。",
+   "ja": "そこで大男はそっと階段を下り、玄関の扉を静かに開けて庭へ出ていきました。けれども子どもたちは大男を見ると、すっかりおびえてみんな逃げてしまい、庭はまた冬になってしまいました。ただあの小さな男の子だけは逃げませんでした。目に涙がいっぱいで、大男が来るのが見えなかったのです。大男は男の子の後ろにそっと近づき、やさしく手ですくい上げて、木の上に乗せてやりました。するとその木はたちまち花を咲かせ、鳥たちがやって来てその上で歌い、男の子は両腕をのばして大男の首に抱きつき、キスをしました。ほかの子どもたちは、大男がもう悪い大男ではないとわかると、走って戻ってきて、子どもたちといっしょに春もやって来ました。「今日からここは君たちの庭だよ、子どもたち」と大男は言い、大きな斧を手に取って塀を打ち壊しました。十二時に市場へ向かう人々は、自分たちがこれまで見たこともないほど美しい庭で、大男が子どもたちと遊んでいるのを目にしました。",
    "g": {
     "crept": "そっと歩いた（creep の過去形）",
     "downstairs": "階下へ",
@@ -503,7 +504,7 @@
     "coming": "来る（see＋人＋〜ing で 人が〜しているのを見る）",
     "stole": "こっそり近づいた（steal の過去形。steal up で 忍び寄る）",
     "behind": "〜の後ろに",
-    "took": "取った（take の過去形。take ... in his hand で 手に取る）",
+    "took": "取った（take の過去形。take ... in his hand で 手ですくい上げる）",
     "gently": "やさしく",
     "hand": "手",
     "put": "置いた・乗せた（put の過去形）",
@@ -520,7 +521,7 @@
     "kissed": "キスした",
     "other": "ほかの",
     "that": "（接続詞）〜ということ",
-    "wicked": "意地悪な・邪悪な",
+    "wicked": "悪い・邪悪な",
     "any": "（not ... any longer で）もはや〜ない",
     "longer": "（not ... any longer で）もはや〜ない",
     "running": "走って（come running で 走ってくる）",
@@ -539,7 +540,7 @@
     "playing": "遊んでいる",
     "most": "（the most ... で）いちばん〜",
     "beautiful": "美しい",
-    "ever": "これまでに",
+    "ever": "（had ever seen で）これまでに（見た）。主語 they は市場へ行く人々",
     "seen": "見た（see の過去分詞）"
    }
   },
@@ -695,7 +696,7 @@
   },
   {
    "en": "Downstairs ran the Giant in great joy, and out into the garden. He hastened across the grass, and came near to the child. And when he came quite close his face grew red with anger, and he said, “Who hath dared to wound thee?” For on the palms of the child’s hands were the prints of two nails, and the prints of two nails were on the little feet.",
-   "ja": "大男は大喜びで階段を駆け下り、庭へ飛び出しました。芝生を急いで横切り、その子のそばまで来ました。ところが、すぐ近くまで来ると、大男の顔は怒りで真っ赤になり、「誰がおまえを傷つけたのだ？」と言いました。その子の手のひらには二つの釘の跡があり、小さな足にも二つの釘の跡があったのです。",
+   "ja": "大男は大喜びで階段を駆け下り、庭へ飛び出しました。芝生を急いで横切り、その子のそばまで来ました。ところが、すぐ近くまで来ると、大男の顔は怒りで真っ赤になり、「いったい誰が、よくもおまえを傷つけたのだ？」と言いました。その子の手のひらには二つの釘の跡があり、小さな足にも二つの釘の跡があったのです。",
    "g": {
     "downstairs": "階下へ（倒置：Downstairs ran the Giant ＝ the Giant ran downstairs）",
     "ran": "走った（run の過去形）",
@@ -713,7 +714,7 @@
     "with": "（red with anger で）〜のために",
     "anger": "怒り",
     "hath": "＝ has（古語）",
-    "dared": "あえて〜した（dare to〜）",
+    "dared": "（dare to〜で）大胆にも〜した・よくも〜した",
     "wound": "傷つける",
     "thee": "＝ you（古語・目的格）",
     "for": "（接続詞）というのも〜だから",
@@ -727,10 +728,10 @@
   },
   {
    "en": "“Who hath dared to wound thee?” cried the Giant; “tell me, that I may take my big sword and slay him.”",
-   "ja": "「誰がおまえを傷つけたのだ？」と大男は叫びました。「言っておくれ。大きな剣を取って、そいつを殺してやる」",
+   "ja": "「いったい誰が、よくもおまえを傷つけたのだ？」と大男は叫びました。「言っておくれ。大きな剣を取って、そいつを斬り殺してやる」",
    "g": {
     "hath": "＝ has（古語）",
-    "dared": "あえて〜した（dare to〜）",
+    "dared": "（dare to〜で）大胆にも〜した・よくも〜した",
     "wound": "傷つける",
     "thee": "＝ you（古語・目的格）",
     "cried": "叫んだ",
@@ -740,7 +741,7 @@
     "take": "取る",
     "big": "大きな",
     "sword": "剣",
-    "slay": "殺す（古風な語）"
+    "slay": "殺す・斬り殺す（古風な語）"
    }
   },
   {
@@ -770,7 +771,7 @@
   },
   {
    "en": "And the child smiled on the Giant, and said to him, “You let me play once in your garden, to-day you shall come with me to my garden, which is Paradise.”",
-   "ja": "その子は大男にほほえみかけて言いました。「あなたは一度、わたしをあなたの庭で遊ばせてくれました。今日は、あなたがわたしといっしょにわたしの庭へ来るのです。それは天国です」",
+   "ja": "その子は大男にほほえみかけて言いました。「あなたは一度、わたしをあなたの庭で遊ばせてくれました。今日は、あなたがわたしといっしょにわたしの庭へ来るのです。そこは天国です」",
    "g": {
     "smiled": "（smile on で）〜にほほえみかけた",
     "let": "（let＋人＋動詞で）〜させてやった",
@@ -786,7 +787,7 @@
   },
   {
    "en": "And when the children ran in that afternoon, they found the Giant lying dead under the tree, all covered with white blossoms.",
-   "ja": "その日の午後、子どもたちが駆け込んでくると、大男はその木の下で、白い花にすっかりおおわれて、息を引き取っていました。",
+   "ja": "その日の午後、子どもたちが駆け込んでくると、大男がその木の下で、白い花にすっかりおおわれて、息絶えて横たわっていました。",
    "g": {
     "ran": "走った（run in で 駆け込む）",
     "that": "その（that afternoon で その日の午後）",
